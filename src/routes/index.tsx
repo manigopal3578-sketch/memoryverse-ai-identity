@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import {
   Sparkles,
   ArrowRight,
@@ -22,7 +23,11 @@ import {
   Award,
   HeartHandshake,
   CircleDot,
+  Menu,
+  X,
+  Home as HomeIcon,
 } from "lucide-react";
+import { toast } from "sonner";
 import { FlipText } from "@/components/mv/FlipText";
 import { CornerButton } from "@/components/mv/CornerButton";
 import { RippleDisplacementSlider } from "@/components/mv/RippleDisplacementSlider";
