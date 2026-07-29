@@ -605,10 +605,14 @@ function FinalCTA() {
             welcomed home.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <CornerButton>
-              Start my MemoryVerse <ArrowRight size={16} />
-            </CornerButton>
-            <CornerButton variant="ghost">Watch 30-sec demo</CornerButton>
+            <Link to="/upload">
+              <CornerButton>
+                Start my MemoryVerse <ArrowRight size={16} />
+              </CornerButton>
+            </Link>
+            <a href="#workspace">
+              <CornerButton variant="ghost">Watch 30-sec demo</CornerButton>
+            </a>
           </div>
         </div>
         <p className="mt-10 text-center text-[11px] uppercase tracking-widest text-muted-foreground">
