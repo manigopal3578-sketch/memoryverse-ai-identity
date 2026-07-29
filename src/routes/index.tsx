@@ -304,14 +304,14 @@ function ProblemSolution() {
 
 function Features() {
   const features = [
-    { icon: Upload, title: "Smart Upload", desc: "Drop anything — the vault handles PDF, image, DOCX, and web links." },
-    { icon: ScanText, title: "AI Categorization", desc: "Certificates, projects, internships, skills — sorted the moment they land." },
-    { icon: FileSearch, title: "Semantic Search", desc: "Ask in plain English. The vault finds the memory, not just the file." },
-    { icon: Clock, title: "Timeline View", desc: "Your journey, drawn as a beautiful, scrollable story of growth." },
-    { icon: Network, title: "Relationship Graph", desc: "See how a skill led to a project, an internship, an award." },
-    { icon: Wand2, title: "Profile Summary", desc: "A living bio that rewrites itself as you grow." },
-    { icon: Zap, title: "Skill Extraction", desc: "Every document becomes a signal — auto-mapped to real skills." },
-    { icon: Rocket, title: "Portfolio Builder", desc: "One click. A resume, a portfolio site, a story-worthy PDF." },
+    { icon: Upload, title: "Smart Upload", desc: "Drop anything — the vault handles PDF, image, DOCX, and web links.", to: "/upload" as const },
+    { icon: ScanText, title: "AI Categorization", desc: "Certificates, projects, internships, skills — sorted the moment they land.", to: "/upload" as const },
+    { icon: FileSearch, title: "Semantic Search", desc: "Ask in plain English. The vault finds the memory, not just the file.", to: "/search" as const },
+    { icon: Clock, title: "Timeline View", desc: "Your journey, drawn as a beautiful, scrollable story of growth.", to: "/timeline" as const },
+    { icon: Network, title: "Relationship Graph", desc: "See how a skill led to a project, an internship, an award.", to: "/graph" as const },
+    { icon: Wand2, title: "Profile Summary", desc: "A living bio that rewrites itself as you grow.", to: "/profile" as const },
+    { icon: Zap, title: "Skill Extraction", desc: "Every document becomes a signal — auto-mapped to real skills.", to: "/profile" as const },
+    { icon: Rocket, title: "Portfolio Builder", desc: "One click. A resume, a portfolio site, a story-worthy PDF.", to: "/profile" as const },
   ];
   return (
     <section id="features" className="relative py-24">
@@ -331,22 +331,27 @@ function Features() {
               viewport={{ once: true, margin: "-60px" }}
               transition={{ delay: (i % 4) * 0.08, duration: 0.6 }}
               whileHover={{ y: -6 }}
-              className="glass group relative overflow-hidden rounded-2xl p-5"
             >
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-md"
-                style={{ background: "var(--gradient-hero)" }}
+              <Link
+                to={f.to}
+                className="glass group relative block h-full overflow-hidden rounded-2xl p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
-                <f.icon size={16} />
-              </div>
-              <div className="mt-4 text-sm font-semibold">{f.title}</div>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                {f.desc}
-              </p>
-              <div
-                className="pointer-events-none absolute inset-x-6 bottom-0 h-px opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                style={{ background: "var(--gradient-hero)" }}
-              />
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-md"
+                  style={{ background: "var(--gradient-hero)" }}
+                >
+                  <f.icon size={16} />
+                </div>
+                <div className="mt-4 flex items-center gap-1 text-sm font-semibold">
+                  {f.title}
+                  <ArrowRight size={12} className="opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{f.desc}</p>
+                <div
+                  className="pointer-events-none absolute inset-x-6 bottom-0 h-px opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  style={{ background: "var(--gradient-hero)" }}
+                />
+              </Link>
             </motion.div>
           ))}
         </div>
