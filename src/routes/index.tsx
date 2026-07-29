@@ -193,12 +193,16 @@ function Hero() {
               transition={{ delay: 0.5, duration: 0.7 }}
               className="mt-8 flex flex-wrap gap-4"
             >
-              <CornerButton>
-                Build my MemoryVerse <ArrowRight size={16} />
-              </CornerButton>
-              <CornerButton variant="ghost">
-                <Sparkles size={14} /> See the live demo
-              </CornerButton>
+              <Link to="/upload">
+                <CornerButton>
+                  Build my MemoryVerse <ArrowRight size={16} />
+                </CornerButton>
+              </Link>
+              <a href="#workspace">
+                <CornerButton variant="ghost">
+                  <Sparkles size={14} /> See the live demo
+                </CornerButton>
+              </a>
             </motion.div>
 
             <motion.div
