@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/mv/AppShell";
 import { CornerButton } from "@/components/mv/CornerButton";
-import { motion } from "framer-motion";
-import { Award, Briefcase, Code2, Download, Edit3, FileText, GraduationCap, Share2, ExternalLink } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Award, Briefcase, Code2, Download, Edit3, FileText, GraduationCap, Share2, ExternalLink, X, Copy, Check, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { jsPDF } from "jspdf";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -18,24 +19,136 @@ export const Route = createFileRoute("/profile")({
   component: ProfilePage,
 });
 
+const identity = {
+  name: "Ananya Rao",
+  tag: "CS Undergraduate · Building at the edge of AI and design",
+  email: "ananya@memoryverse.ai",
+  location: "Bengaluru, India",
+  skills: ["React", "TypeScript", "Python", "ML", "System Design", "Product"],
+  education: [
+    { primary: "B.Tech, Computer Science", secondary: "IIT Roorkee · 2022 – 2026 · CGPA 9.1" },
+    { primary: "AISSCE (12th)", secondary: "DPS · 2022 · 96.4%" },
+  ],
+  internships: [
+    { primary: "Software Engineering Intern", secondary: "Google · Summer 2024 · Bangalore" },
+    { primary: "Cloud Intern", secondary: "Microsoft · Winter 2023 · Hyderabad" },
+  ],
+  projects: [
+    { primary: "MemoryVerse AI", secondary: "Capstone · React · LLM · 2024" },
+    { primary: "Realtime Chat App", secondary: "React · WebSockets · 2023" },
+  ],
+  awards: [
+    { primary: "Stanford ML Certificate", secondary: "Coursera · 2024" },
+    { primary: "AWS Cloud Practitioner", secondary: "Amazon · 2023" },
+    { primary: "1st place — HackCampus", secondary: "36-hour hack · 2022" },
+  ],
+  story:
+    "Ananya is a builder — a rare mix of designer's eye and engineer's rigor. From her first hackathon win in 2022 to a Google summer internship in 2024, every artifact tells the same quiet story: someone who ships, learns, and elevates the people around her.",
+};
+
+function generateResumePDF(name: string, tag: string) {
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const margin = 48;
+  let y = margin;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(24);
+  doc.text(name, margin, y);
+  y += 22;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.setTextColor(90);
+  doc.text(tag, margin, y);
+  y += 14;
+  doc.text(`${identity.email}  ·  ${identity.location}`, margin, y);
+  y += 24;
+
+  const section = (title: string) => {
+    doc.setTextColor(80, 40, 200);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text(title.toUpperCase(), margin, y);
+    y += 6;
+    doc.setDrawColor(220);
+    doc.line(margin, y, 595 - margin, y);
+    y += 14;
+    doc.setTextColor(30);
+  };
+
+  const item = (primary: string, secondary: string) => {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text(primary, margin, y);
+    y += 13;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(110);
+    doc.text(secondary, margin, y);
+    y += 16;
+    doc.setTextColor(30);
+  };
+
+  section("Summary");
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10.5);
+  const wrapped = doc.splitTextToSize(identity.story, 595 - margin * 2);
+  doc.text(wrapped, margin, y);
+  y += wrapped.length * 13 + 8;
+
+  section("Skills");
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10.5);
+  doc.text(identity.skills.join("  ·  "), margin, y);
+  y += 22;
+
+  section("Education");
+  identity.education.forEach((e) => item(e.primary, e.secondary));
+
+  section("Experience");
+  identity.internships.forEach((e) => item(e.primary, e.secondary));
+
+  section("Projects");
+  identity.projects.forEach((e) => item(e.primary, e.secondary));
+
+  section("Awards & Certificates");
+  identity.awards.forEach((e) => item(e.primary, e.secondary));
+
+  doc.setFontSize(8);
+  doc.setTextColor(160);
+  doc.text("Composed by MemoryVerse AI · memoryverse.ai", margin, 820);
+
+  doc.save(`resume_${name.toLowerCase().replace(/\s+/g, "_")}.pdf`);
+}
+
 function ProfilePage() {
   const [editing, setEditing] = useState(false);
-  const [name, setName] = useState("Ananya Rao");
-  const [tag, setTag] = useState("CS Undergraduate · Building at the edge of AI and design");
+  const [name, setName] = useState(identity.name);
+  const [tag, setTag] = useState(identity.tag);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [resumeOpen, setResumeOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const doShare = async () => {
+  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/profile?u=ananya-rao` : "/profile";
+
+  const copyShare = async () => {
     try {
-      await navigator.clipboard?.writeText(window.location.href);
-      toast.success("Profile link copied", { description: "Ready to send to recruiters." });
+      await navigator.clipboard?.writeText(shareUrl);
+      setCopied(true);
+      toast.success("Share link copied");
+      setTimeout(() => setCopied(false), 1600);
     } catch {
-      toast("Share link", { description: window.location.href });
+      toast("Share link", { description: shareUrl });
     }
   };
+
   const doExport = () => {
-    toast.success("Resume exported", { description: "resume_ananya_rao.pdf ready in your vault." });
-  };
-  const doViewResume = () => {
-    toast("Opening resume preview", { description: "AI-polished · 1 page · v3" });
+    try {
+      generateResumePDF(name, tag);
+      toast.success("Resume PDF generated", { description: "Downloaded to your device." });
+    } catch (e) {
+      toast.error("Could not generate PDF");
+    }
   };
 
   return (
@@ -51,7 +164,7 @@ function ProfilePage() {
               className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl font-display text-3xl text-white shadow-[var(--shadow-glow)]"
               style={{ background: "var(--gradient-hero)" }}
             >
-              AR
+              {name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
             </div>
             <div className="min-w-0 flex-1">
               {editing ? (
@@ -66,7 +179,7 @@ function ProfilePage() {
                 </>
               )}
               <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-                {["React", "Python", "ML", "System Design", "Product"].map((s) => (
+                {identity.skills.map((s) => (
                   <span key={s} className="glass rounded-full px-2.5 py-1 font-semibold text-primary">{s}</span>
                 ))}
               </div>
@@ -75,11 +188,11 @@ function ProfilePage() {
               <button onClick={() => setEditing((v) => !v)} className="glass inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold">
                 <Edit3 size={12} /> {editing ? "Save" : "Edit"}
               </button>
-              <button onClick={doShare} className="glass inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold">
+              <button onClick={() => setShareOpen(true)} className="glass inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold">
                 <Share2 size={12} /> Share
               </button>
               <button onClick={doExport} className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold text-white" style={{ background: "var(--gradient-hero)" }}>
-                <Download size={12} /> Export
+                <Download size={12} /> Export PDF
               </button>
             </div>
           </div>
@@ -103,16 +216,12 @@ function ProfilePage() {
           </div>
           <div className="glass rounded-2xl p-6">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">AI Career Story</div>
-            <p className="mt-2 text-sm leading-relaxed">
-              Ananya is a builder — a rare mix of designer's eye and engineer's rigor. From her first
-              hackathon win in 2022 to a Google summer internship in 2024, every artifact tells the same
-              quiet story: someone who ships, learns, and elevates the people around her.
-            </p>
+            <p className="mt-2 text-sm leading-relaxed">{identity.story}</p>
           </div>
           <div className="glass rounded-2xl p-6">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Quick actions</div>
             <div className="mt-3 space-y-2">
-              <button onClick={doViewResume} className="flex w-full items-center justify-between rounded-xl bg-white/60 px-3 py-2 text-xs font-semibold hover:bg-white">
+              <button onClick={() => setResumeOpen(true)} className="flex w-full items-center justify-between rounded-xl bg-white/60 px-3 py-2 text-xs font-semibold hover:bg-white">
                 View resume <ExternalLink size={12} />
               </button>
               <Link to="/upload" className="flex w-full items-center justify-between rounded-xl bg-white/60 px-3 py-2 text-xs font-semibold hover:bg-white">
@@ -126,23 +235,10 @@ function ProfilePage() {
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <Section title="Education" icon={GraduationCap} tint="var(--violet)" items={[
-            { primary: "B.Tech, Computer Science", secondary: "IIT Roorkee · 2022 – 2026 · CGPA 9.1" },
-            { primary: "AISSCE (12th)", secondary: "DPS · 2022 · 96.4%" },
-          ]} />
-          <Section title="Internships" icon={Briefcase} tint="var(--ice)" items={[
-            { primary: "Software Engineering Intern", secondary: "Google · Summer 2024 · Bangalore" },
-            { primary: "Cloud Intern", secondary: "Microsoft · Winter 2023 · Hyderabad" },
-          ]} />
-          <Section title="Projects" icon={Code2} tint="var(--mint)" items={[
-            { primary: "MemoryVerse AI", secondary: "Capstone · React · LLM · 2024" },
-            { primary: "Realtime Chat App", secondary: "React · WebSockets · 2023" },
-          ]} />
-          <Section title="Awards & Certificates" icon={Award} tint="var(--amber)" items={[
-            { primary: "Stanford ML Certificate", secondary: "Coursera · 2024" },
-            { primary: "AWS Cloud Practitioner", secondary: "Amazon · 2023" },
-            { primary: "1st place — HackCampus", secondary: "36-hour hack · 2022" },
-          ]} />
+          <Section title="Education" icon={GraduationCap} tint="var(--violet)" items={identity.education} />
+          <Section title="Internships" icon={Briefcase} tint="var(--ice)" items={identity.internships} />
+          <Section title="Projects" icon={Code2} tint="var(--mint)" items={identity.projects} />
+          <Section title="Awards & Certificates" icon={Award} tint="var(--amber)" items={identity.awards} />
         </div>
 
         <div className="mt-8 glass rounded-2xl p-6">
@@ -176,7 +272,125 @@ function ProfilePage() {
           </Link>
         </div>
       </div>
+
+      {/* Share modal with link preview */}
+      <AnimatePresence>
+        {shareOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6 backdrop-blur-sm"
+            onClick={() => setShareOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass relative w-full max-w-md rounded-2xl p-6"
+            >
+              <button onClick={() => setShareOpen(false)} className="absolute right-4 top-4 rounded-full p-1 text-muted-foreground hover:text-foreground" aria-label="Close">
+                <X size={16} />
+              </button>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Share preview</div>
+              <h3 className="mt-1 font-display text-2xl">Your shareable identity</h3>
+
+              <div className="mt-5 overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm">
+                <div className="relative h-28" style={{ background: "var(--gradient-hero)" }}>
+                  <div className="absolute inset-0 flex items-center justify-center text-white">
+                    <Sparkles size={24} />
+                  </div>
+                </div>
+                <div className="p-4">
+                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">memoryverse.ai</div>
+                  <div className="mt-1 text-sm font-semibold">{name} · Digital Identity</div>
+                  <div className="text-[11px] text-muted-foreground">{tag}</div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2 rounded-xl bg-white/60 p-2">
+                <div className="flex-1 truncate px-2 text-[11px] text-muted-foreground">{shareUrl}</div>
+                <button
+                  onClick={copyShare}
+                  className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-[11px] font-semibold text-white"
+                  style={{ background: "var(--gradient-hero)" }}
+                >
+                  {copied ? <><Check size={12} /> Copied</> : <><Copy size={12} /> Copy link</>}
+                </button>
+              </div>
+
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`My MemoryVerse identity`)}`} target="_blank" rel="noreferrer" className="glass rounded-xl px-3 py-2 text-center text-[11px] font-semibold">Twitter</a>
+                <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noreferrer" className="glass rounded-xl px-3 py-2 text-center text-[11px] font-semibold">LinkedIn</a>
+                <a href={`mailto:?subject=My%20MemoryVerse&body=${encodeURIComponent(shareUrl)}`} className="glass rounded-xl px-3 py-2 text-center text-[11px] font-semibold">Email</a>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Resume preview modal */}
+      <AnimatePresence>
+        {resumeOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6 backdrop-blur-sm"
+            onClick={() => setResumeOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl p-8"
+            >
+              <button onClick={() => setResumeOpen(false)} className="absolute right-4 top-4 rounded-full p-1 text-muted-foreground hover:text-foreground" aria-label="Close">
+                <X size={16} />
+              </button>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-primary">Resume · AI-polished · v3</div>
+              <h3 className="mt-1 font-display text-3xl">{name}</h3>
+              <p className="text-xs text-muted-foreground">{tag}</p>
+              <p className="mt-4 text-sm leading-relaxed">{identity.story}</p>
+
+              <ResumeBlock title="Skills">
+                <p className="text-xs text-muted-foreground">{identity.skills.join("  ·  ")}</p>
+              </ResumeBlock>
+              <ResumeBlock title="Education">
+                {identity.education.map((e) => <MiniRow key={e.primary} {...e} />)}
+              </ResumeBlock>
+              <ResumeBlock title="Experience">
+                {identity.internships.map((e) => <MiniRow key={e.primary} {...e} />)}
+              </ResumeBlock>
+              <ResumeBlock title="Projects">
+                {identity.projects.map((e) => <MiniRow key={e.primary} {...e} />)}
+              </ResumeBlock>
+              <ResumeBlock title="Awards">
+                {identity.awards.map((e) => <MiniRow key={e.primary} {...e} />)}
+              </ResumeBlock>
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button onClick={() => setResumeOpen(false)} className="glass rounded-xl px-4 py-2 text-xs font-semibold">Close</button>
+                <button onClick={doExport} className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold text-white" style={{ background: "var(--gradient-hero)" }}>
+                  <Download size={12} /> Download PDF
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AppShell>
+  );
+}
+
+function ResumeBlock({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-5">
+      <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-primary">{title}</div>
+      <div className="space-y-2">{children}</div>
+    </div>
+  );
+}
+function MiniRow({ primary, secondary }: { primary: string; secondary: string }) {
+  return (
+    <div className="rounded-lg bg-white/60 p-3">
+      <div className="text-sm font-semibold">{primary}</div>
+      <div className="text-[11px] text-muted-foreground">{secondary}</div>
+    </div>
   );
 }
 
