@@ -71,6 +71,14 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
 }
 
 function Nav() {
+  const [open, setOpen] = useState(false);
+  const links = [
+    { to: "/upload", label: "Upload" },
+    { to: "/search", label: "Search" },
+    { to: "/timeline", label: "Timeline" },
+    { to: "/graph", label: "Graph" },
+    { to: "/profile", label: "Profile" },
+  ] as const;
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -79,7 +87,7 @@ function Nav() {
       className="fixed inset-x-0 top-4 z-40 flex justify-center px-4"
     >
       <div className="glass flex w-full max-w-5xl items-center justify-between rounded-2xl px-4 py-2.5">
-        <a href="#" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <div
             className="flex h-8 w-8 items-center justify-center rounded-lg text-white"
             style={{ background: "var(--gradient-hero)" }}
@@ -90,18 +98,60 @@ function Nav() {
           <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
             AI
           </span>
-        </a>
-        <nav className="hidden items-center gap-6 text-xs font-medium text-muted-foreground md:flex">
-          <a href="#features" className="hover:text-foreground">Features</a>
-          <a href="#workspace" className="hover:text-foreground">Workspace</a>
-          <a href="#upload" className="hover:text-foreground">Upload</a>
-          <a href="#graph" className="hover:text-foreground">Intelligence</a>
-          <a href="#love" className="hover:text-foreground">Students</a>
+        </Link>
+        <nav className="hidden items-center gap-1 md:flex">
+          {links.map((l) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-primary/5 hover:text-foreground"
+              activeProps={{ className: "bg-primary/10 text-primary" }}
+            >
+              {l.label}
+            </Link>
+          ))}
         </nav>
-        <CornerButton className="!py-2 !px-4 text-xs">
-          Get early access <ArrowRight size={14} />
-        </CornerButton>
+        <div className="flex items-center gap-2">
+          <Link to="/upload" className="hidden md:block">
+            <CornerButton className="!py-2 !px-4 text-xs">
+              Get early access <ArrowRight size={14} />
+            </CornerButton>
+          </Link>
+          <button
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Toggle menu"
+            className="glass flex h-9 w-9 items-center justify-center rounded-xl md:hidden"
+          >
+            {open ? <X size={16} /> : <Menu size={16} />}
+          </button>
+        </div>
       </div>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="glass absolute top-16 mx-4 w-[calc(100%-2rem)] max-w-5xl rounded-2xl p-3 md:hidden"
+          >
+            <div className="flex flex-col">
+              {links.map((l) => (
+                <Link
+                  key={l.to}
+                  to={l.to}
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-primary/5 hover:text-foreground"
+                >
+                  {l.label}
+                </Link>
+              ))}
+              <Link to="/upload" onClick={() => setOpen(false)} className="mt-2 rounded-lg px-3 py-2 text-sm font-semibold text-white" style={{ background: "var(--gradient-hero)" }}>
+                Get early access
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
