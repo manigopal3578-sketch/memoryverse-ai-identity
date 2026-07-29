@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import {
   Sparkles,
   ArrowRight,
@@ -22,7 +23,11 @@ import {
   Award,
   HeartHandshake,
   CircleDot,
+  Menu,
+  X,
+  Home as HomeIcon,
 } from "lucide-react";
+import { toast } from "sonner";
 import { FlipText } from "@/components/mv/FlipText";
 import { CornerButton } from "@/components/mv/CornerButton";
 import { RippleDisplacementSlider } from "@/components/mv/RippleDisplacementSlider";
@@ -66,6 +71,14 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
 }
 
 function Nav() {
+  const [open, setOpen] = useState(false);
+  const links = [
+    { to: "/upload", label: "Upload" },
+    { to: "/search", label: "Search" },
+    { to: "/timeline", label: "Timeline" },
+    { to: "/graph", label: "Graph" },
+    { to: "/profile", label: "Profile" },
+  ] as const;
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -74,7 +87,7 @@ function Nav() {
       className="fixed inset-x-0 top-4 z-40 flex justify-center px-4"
     >
       <div className="glass flex w-full max-w-5xl items-center justify-between rounded-2xl px-4 py-2.5">
-        <a href="#" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <div
             className="flex h-8 w-8 items-center justify-center rounded-lg text-white"
             style={{ background: "var(--gradient-hero)" }}
@@ -85,18 +98,60 @@ function Nav() {
           <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
             AI
           </span>
-        </a>
-        <nav className="hidden items-center gap-6 text-xs font-medium text-muted-foreground md:flex">
-          <a href="#features" className="hover:text-foreground">Features</a>
-          <a href="#workspace" className="hover:text-foreground">Workspace</a>
-          <a href="#upload" className="hover:text-foreground">Upload</a>
-          <a href="#graph" className="hover:text-foreground">Intelligence</a>
-          <a href="#love" className="hover:text-foreground">Students</a>
+        </Link>
+        <nav className="hidden items-center gap-1 md:flex">
+          {links.map((l) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-primary/5 hover:text-foreground"
+              activeProps={{ className: "bg-primary/10 text-primary" }}
+            >
+              {l.label}
+            </Link>
+          ))}
         </nav>
-        <CornerButton className="!py-2 !px-4 text-xs">
-          Get early access <ArrowRight size={14} />
-        </CornerButton>
+        <div className="flex items-center gap-2">
+          <Link to="/upload" className="hidden md:block">
+            <CornerButton className="!py-2 !px-4 text-xs">
+              Get early access <ArrowRight size={14} />
+            </CornerButton>
+          </Link>
+          <button
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Toggle menu"
+            className="glass flex h-9 w-9 items-center justify-center rounded-xl md:hidden"
+          >
+            {open ? <X size={16} /> : <Menu size={16} />}
+          </button>
+        </div>
       </div>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="glass absolute top-16 mx-4 w-[calc(100%-2rem)] max-w-5xl rounded-2xl p-3 md:hidden"
+          >
+            <div className="flex flex-col">
+              {links.map((l) => (
+                <Link
+                  key={l.to}
+                  to={l.to}
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-primary/5 hover:text-foreground"
+                >
+                  {l.label}
+                </Link>
+              ))}
+              <Link to="/upload" onClick={() => setOpen(false)} className="mt-2 rounded-lg px-3 py-2 text-sm font-semibold text-white" style={{ background: "var(--gradient-hero)" }}>
+                Get early access
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
@@ -138,12 +193,16 @@ function Hero() {
               transition={{ delay: 0.5, duration: 0.7 }}
               className="mt-8 flex flex-wrap gap-4"
             >
-              <CornerButton>
-                Build my MemoryVerse <ArrowRight size={16} />
-              </CornerButton>
-              <CornerButton variant="ghost">
-                <Sparkles size={14} /> See the live demo
-              </CornerButton>
+              <Link to="/upload">
+                <CornerButton>
+                  Build my MemoryVerse <ArrowRight size={16} />
+                </CornerButton>
+              </Link>
+              <a href="#workspace">
+                <CornerButton variant="ghost">
+                  <Sparkles size={14} /> See the live demo
+                </CornerButton>
+              </a>
             </motion.div>
 
             <motion.div
@@ -245,14 +304,14 @@ function ProblemSolution() {
 
 function Features() {
   const features = [
-    { icon: Upload, title: "Smart Upload", desc: "Drop anything — the vault handles PDF, image, DOCX, and web links." },
-    { icon: ScanText, title: "AI Categorization", desc: "Certificates, projects, internships, skills — sorted the moment they land." },
-    { icon: FileSearch, title: "Semantic Search", desc: "Ask in plain English. The vault finds the memory, not just the file." },
-    { icon: Clock, title: "Timeline View", desc: "Your journey, drawn as a beautiful, scrollable story of growth." },
-    { icon: Network, title: "Relationship Graph", desc: "See how a skill led to a project, an internship, an award." },
-    { icon: Wand2, title: "Profile Summary", desc: "A living bio that rewrites itself as you grow." },
-    { icon: Zap, title: "Skill Extraction", desc: "Every document becomes a signal — auto-mapped to real skills." },
-    { icon: Rocket, title: "Portfolio Builder", desc: "One click. A resume, a portfolio site, a story-worthy PDF." },
+    { icon: Upload, title: "Smart Upload", desc: "Drop anything — the vault handles PDF, image, DOCX, and web links.", to: "/upload" as const },
+    { icon: ScanText, title: "AI Categorization", desc: "Certificates, projects, internships, skills — sorted the moment they land.", to: "/upload" as const },
+    { icon: FileSearch, title: "Semantic Search", desc: "Ask in plain English. The vault finds the memory, not just the file.", to: "/search" as const },
+    { icon: Clock, title: "Timeline View", desc: "Your journey, drawn as a beautiful, scrollable story of growth.", to: "/timeline" as const },
+    { icon: Network, title: "Relationship Graph", desc: "See how a skill led to a project, an internship, an award.", to: "/graph" as const },
+    { icon: Wand2, title: "Profile Summary", desc: "A living bio that rewrites itself as you grow.", to: "/profile" as const },
+    { icon: Zap, title: "Skill Extraction", desc: "Every document becomes a signal — auto-mapped to real skills.", to: "/profile" as const },
+    { icon: Rocket, title: "Portfolio Builder", desc: "One click. A resume, a portfolio site, a story-worthy PDF.", to: "/profile" as const },
   ];
   return (
     <section id="features" className="relative py-24">
@@ -272,22 +331,27 @@ function Features() {
               viewport={{ once: true, margin: "-60px" }}
               transition={{ delay: (i % 4) * 0.08, duration: 0.6 }}
               whileHover={{ y: -6 }}
-              className="glass group relative overflow-hidden rounded-2xl p-5"
             >
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-md"
-                style={{ background: "var(--gradient-hero)" }}
+              <Link
+                to={f.to}
+                className="glass group relative block h-full overflow-hidden rounded-2xl p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
-                <f.icon size={16} />
-              </div>
-              <div className="mt-4 text-sm font-semibold">{f.title}</div>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                {f.desc}
-              </p>
-              <div
-                className="pointer-events-none absolute inset-x-6 bottom-0 h-px opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                style={{ background: "var(--gradient-hero)" }}
-              />
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-md"
+                  style={{ background: "var(--gradient-hero)" }}
+                >
+                  <f.icon size={16} />
+                </div>
+                <div className="mt-4 flex items-center gap-1 text-sm font-semibold">
+                  {f.title}
+                  <ArrowRight size={12} className="opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{f.desc}</p>
+                <div
+                  className="pointer-events-none absolute inset-x-6 bottom-0 h-px opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  style={{ background: "var(--gradient-hero)" }}
+                />
+              </Link>
             </motion.div>
           ))}
         </div>
@@ -541,10 +605,14 @@ function FinalCTA() {
             welcomed home.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <CornerButton>
-              Start my MemoryVerse <ArrowRight size={16} />
-            </CornerButton>
-            <CornerButton variant="ghost">Watch 30-sec demo</CornerButton>
+            <Link to="/upload">
+              <CornerButton>
+                Start my MemoryVerse <ArrowRight size={16} />
+              </CornerButton>
+            </Link>
+            <a href="#workspace">
+              <CornerButton variant="ghost">Watch 30-sec demo</CornerButton>
+            </a>
           </div>
         </div>
         <p className="mt-10 text-center text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -557,12 +625,25 @@ function FinalCTA() {
 
 function Home() {
   const dockItems = [
-    { icon: Upload, label: "Upload" },
-    { icon: Search, label: "Search" },
-    { icon: Clock, label: "Timeline" },
-    { icon: Network, label: "Graph" },
-    { icon: User, label: "Profile" },
-    { icon: Share2, label: "Share" },
+    { icon: HomeIcon, label: "Home", to: "/" },
+    { icon: Upload, label: "Upload", to: "/upload" },
+    { icon: Search, label: "Search", to: "/search" },
+    { icon: Clock, label: "Timeline", to: "/timeline" },
+    { icon: Network, label: "Graph", to: "/graph" },
+    { icon: User, label: "Profile", to: "/profile" },
+    {
+      icon: Share2,
+      label: "Share",
+      to: "#",
+      onClick: () => {
+        if (typeof navigator !== "undefined" && navigator.share) {
+          navigator.share({ title: "MemoryVerse AI", url: window.location.href }).catch(() => {});
+        } else if (typeof navigator !== "undefined") {
+          navigator.clipboard?.writeText(window.location.href);
+          toast.success("Link copied to clipboard");
+        }
+      },
+    },
   ];
   return (
     <div className="relative min-h-screen overflow-hidden">

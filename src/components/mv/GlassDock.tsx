@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 
 export interface DockItem {
   icon: LucideIcon;
   label: string;
-  color?: string;
+  to: string;
+  onClick?: () => void;
 }
 
 export function GlassDock({ items }: { items: DockItem[] }) {
@@ -22,18 +24,8 @@ export function GlassDock({ items }: { items: DockItem[] }) {
         {items.map((it, i) => {
           const Icon = it.icon;
           const active = hover === i;
-          return (
-            <motion.button
-              key={it.label}
-              onHoverStart={() => setHover(i)}
-              onHoverEnd={() => setHover(null)}
-              animate={{ scale: active ? 1.25 : 1, y: active ? -8 : 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 18 }}
-              className="relative flex h-11 w-11 items-center justify-center rounded-xl text-white/80 hover:text-white"
-              style={{
-                background: active ? "var(--gradient-hero)" : "transparent",
-              }}
-            >
+          const inner = (
+            <>
               <Icon size={18} />
               {active && (
                 <motion.span
@@ -44,7 +36,33 @@ export function GlassDock({ items }: { items: DockItem[] }) {
                   {it.label}
                 </motion.span>
               )}
-            </motion.button>
+            </>
+          );
+          const className =
+            "relative flex h-11 w-11 items-center justify-center rounded-xl text-white/80 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60";
+          const style = { background: active ? "var(--gradient-hero)" : "transparent" };
+          const wrap = (children: React.ReactNode) => (
+            <motion.div
+              key={it.label}
+              onHoverStart={() => setHover(i)}
+              onHoverEnd={() => setHover(null)}
+              animate={{ scale: active ? 1.25 : 1, y: active ? -8 : 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 18 }}
+            >
+              {children}
+            </motion.div>
+          );
+          if (it.onClick) {
+            return wrap(
+              <button aria-label={it.label} onClick={it.onClick} className={className} style={style}>
+                {inner}
+              </button>,
+            );
+          }
+          return wrap(
+            <Link to={it.to} aria-label={it.label} className={className} style={style}>
+              {inner}
+            </Link>,
           );
         })}
       </motion.div>
