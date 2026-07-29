@@ -625,12 +625,25 @@ function FinalCTA() {
 
 function Home() {
   const dockItems = [
-    { icon: Upload, label: "Upload" },
-    { icon: Search, label: "Search" },
-    { icon: Clock, label: "Timeline" },
-    { icon: Network, label: "Graph" },
-    { icon: User, label: "Profile" },
-    { icon: Share2, label: "Share" },
+    { icon: HomeIcon, label: "Home", to: "/" },
+    { icon: Upload, label: "Upload", to: "/upload" },
+    { icon: Search, label: "Search", to: "/search" },
+    { icon: Clock, label: "Timeline", to: "/timeline" },
+    { icon: Network, label: "Graph", to: "/graph" },
+    { icon: User, label: "Profile", to: "/profile" },
+    {
+      icon: Share2,
+      label: "Share",
+      to: "#",
+      onClick: () => {
+        if (typeof navigator !== "undefined" && navigator.share) {
+          navigator.share({ title: "MemoryVerse AI", url: window.location.href }).catch(() => {});
+        } else if (typeof navigator !== "undefined") {
+          navigator.clipboard?.writeText(window.location.href);
+          toast.success("Link copied to clipboard");
+        }
+      },
+    },
   ];
   return (
     <div className="relative min-h-screen overflow-hidden">
