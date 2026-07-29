@@ -80,6 +80,27 @@
   * { border-color: var(--color-border); }
   html, body { background: var(--color-background); color: var(--color-foreground); font-family: var(--font-sans); }
   ::selection { background: oklch(0.55 0.26 295 / 0.25); }
+  :focus { outline: none; }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  a:focus-visible, button:focus-visible, [role="button"]:focus-visible, [tabindex]:focus-visible {
+    box-shadow: 0 0 0 3px oklch(0.55 0.26 295 / 0.35);
+  }
+  mark.mv-hit {
+    background: linear-gradient(180deg, transparent 55%, oklch(0.82 0.15 75 / 0.55) 55%);
+    color: inherit; cursor: pointer; padding: 0 2px; border-radius: 3px;
+    transition: background 0.2s;
+  }
+  mark.mv-hit:hover, mark.mv-hit:focus-visible {
+    background: linear-gradient(180deg, transparent 40%, oklch(0.82 0.15 75 / 0.85) 40%);
+  }
+  mark.mv-hit.active {
+    background: oklch(0.82 0.15 75 / 0.7);
+    outline: 2px solid var(--ring);
+  }
 }
 
 @utility glass {
