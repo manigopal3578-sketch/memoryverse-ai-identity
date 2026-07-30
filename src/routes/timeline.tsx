@@ -6,6 +6,10 @@ import { Award, Briefcase, Code2, GraduationCap, X, FileText, Sparkles, Tag, Lin
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/timeline")({
+  validateSearch: (s: Record<string, unknown>): { skill?: string; event?: string } => ({
+    skill: typeof s.skill === "string" ? s.skill : undefined,
+    event: typeof s.event === "string" ? s.event : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Timeline — MemoryVerse AI" },

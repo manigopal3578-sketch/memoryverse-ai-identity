@@ -6,6 +6,10 @@ import { Award, Briefcase, Code2, GraduationCap, Sparkles, FileText, ZoomIn, Zoo
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/graph")({
+  validateSearch: (s: Record<string, unknown>): { skill?: string; node?: string } => ({
+    skill: typeof s.skill === "string" ? s.skill : undefined,
+    node: typeof s.node === "string" ? s.node : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Knowledge Graph — MemoryVerse AI" },
