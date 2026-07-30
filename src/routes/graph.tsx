@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/mv/AppShell";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Award, Briefcase, Code2, GraduationCap, Sparkles, FileText, ZoomIn, ZoomOut, RotateCcw, Filter, X, Link2, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/graph")({
+  validateSearch: (s: Record<string, unknown>): { skill?: string; node?: string } => ({
+    skill: typeof s.skill === "string" ? s.skill : undefined,
+    node: typeof s.node === "string" ? s.node : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Knowledge Graph — MemoryVerse AI" },
@@ -61,9 +65,32 @@ const filters: { key: NodeKind | "all"; label: string }[] = [
 ];
 
 function GraphPage() {
+  const { skill, node } = Route.useSearch();
   const [zoom, setZoom] = useState(1);
   const [filter, setFilter] = useState<NodeKind | "all">("all");
   const [selected, setSelected] = useState<N | null>(null);
+
+  useEffect(() => {
+    if (node) {
+      const n = allNodes.find((x) => x.id === node);
+      if (n) setSelected(n);
+    } else if (skill) {
+      const n = allNodes.find((x) =>
+        x.skills.some((s) => s.toLowerCase().includes(skill.toLowerCase())) ||
+        x.label.toLowerCase().includes(skill.toLowerCase()),
+      );
+      if (n) setSelected(n);
+    }
+  }, [node, skill]);
+
+  const skillMatches = useMemo(() => {
+    if (!skill) return new Set<string>();
+    return new Set(
+      allNodes
+        .filter((n) => n.skills.some((s) => s.toLowerCase().includes(skill.toLowerCase())) || n.label.toLowerCase().includes(skill.toLowerCase()))
+        .map((n) => n.id),
+    );
+  }, [skill]);
 
   const visibleIds = useMemo(
     () => new Set(allNodes.filter((n) => filter === "all" || n.kind === filter || n.kind === "ai").map((n) => n.id)),
@@ -90,7 +117,7 @@ function GraphPage() {
       title={<>Every memory, <span className="text-gradient">quietly connected</span>.</>}
       subtitle="Click any node to inspect the story it belongs to."
     >
-      <div className="mx-auto max-w-6xl px-6 pb-16">
+      <div className="mx-auto max-w-7xl px-6 pb-16">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <Filter size={14} className="text-muted-foreground" />
@@ -125,8 +152,8 @@ function GraphPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
-          <div className="glass relative aspect-[16/10] w-full overflow-hidden rounded-3xl p-6">
+        <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
+          <div className="glass relative h-[560px] w-full overflow-hidden rounded-3xl p-6 md:h-[680px]">
             <motion.div animate={{ scale: zoom }} transition={{ type: "spring", stiffness: 120, damping: 20 }} className="absolute inset-0 origin-center">
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <defs>
@@ -167,7 +194,7 @@ function GraphPage() {
                     className="absolute -translate-x-1/2 -translate-y-1/2"
                     style={{ left: `${n.x}%`, top: `${n.y}%` }}
                   >
-                    <div className={cn("glass flex items-center gap-2 rounded-full px-3 py-1.5 shadow-md transition", isSel && "glow-ring scale-110", isRelated && "ring-1 ring-primary/40")}>
+                    <div className={cn("glass flex items-center gap-2 rounded-full px-3 py-1.5 shadow-md transition", isSel && "glow-ring scale-110", isRelated && "ring-1 ring-primary/40", skillMatches.has(n.id) && "ring-2 ring-amber-400")}>
                       <span className="flex h-6 w-6 items-center justify-center rounded-full text-white" style={{ background: n.tint }}>
                         <Icon size={12} />
                       </span>

@@ -27,6 +27,8 @@ import {
 import { cn } from "@/lib/utils";
 import { smartName, smartNameFromUrl, type SmartCategory } from "@/lib/smart-name";
 import { toast } from "sonner";
+import { logCorrection } from "@/lib/mv-store";
+import { CorrectionHistory } from "./CorrectionHistory";
 
 const DocumentViewer = lazy(() =>
   import("./DocumentViewer").then((m) => ({ default: m.DocumentViewer })),
@@ -261,12 +263,21 @@ export function UploadStudio() {
           : f,
       ),
     );
+    const item = files.find((f) => f.id === fileId);
+    const val = item?.fields.find((fd) => fd.label === label)?.value ?? "";
+    logCorrection({ itemId: fileId, itemName: item?.displayName ?? fileId, field: label, kind: feedback, before: val, after: val });
     toast.success("Thanks — AI learning", {
       description: `Timeline, graph & search updated for ${label}.`,
     });
   };
 
   const editField = (fileId: string, label: string, value: string) => {
+    const item = files.find((f) => f.id === fileId);
+    const before = item?.fields.find((fd) => fd.label === label)?.value ?? "";
+    if (before !== value) {
+      logCorrection({ itemId: fileId, itemName: item?.displayName ?? fileId, field: label, kind: "edit", before, after: value });
+      toast.success("Correction saved", { description: `${label} updated — timeline, graph & search refreshed.` });
+    }
     setFiles((prev) =>
       prev.map((f) =>
         f.id === fileId
@@ -620,6 +631,8 @@ export function UploadStudio() {
             </Suspense>
           )}
         </AnimatePresence>
+
+        <CorrectionHistory compact />
       </div>
 
       {/* Detail modal */}
