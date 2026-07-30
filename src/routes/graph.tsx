@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/mv/AppShell";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Award, Briefcase, Code2, GraduationCap, Sparkles, FileText, ZoomIn, ZoomOut, RotateCcw, Filter, X, Link2, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -65,9 +65,32 @@ const filters: { key: NodeKind | "all"; label: string }[] = [
 ];
 
 function GraphPage() {
+  const { skill, node } = Route.useSearch();
   const [zoom, setZoom] = useState(1);
   const [filter, setFilter] = useState<NodeKind | "all">("all");
   const [selected, setSelected] = useState<N | null>(null);
+
+  useEffect(() => {
+    if (node) {
+      const n = allNodes.find((x) => x.id === node);
+      if (n) setSelected(n);
+    } else if (skill) {
+      const n = allNodes.find((x) =>
+        x.skills.some((s) => s.toLowerCase().includes(skill.toLowerCase())) ||
+        x.label.toLowerCase().includes(skill.toLowerCase()),
+      );
+      if (n) setSelected(n);
+    }
+  }, [node, skill]);
+
+  const skillMatches = useMemo(() => {
+    if (!skill) return new Set<string>();
+    return new Set(
+      allNodes
+        .filter((n) => n.skills.some((s) => s.toLowerCase().includes(skill.toLowerCase())) || n.label.toLowerCase().includes(skill.toLowerCase()))
+        .map((n) => n.id),
+    );
+  }, [skill]);
 
   const visibleIds = useMemo(
     () => new Set(allNodes.filter((n) => filter === "all" || n.kind === filter || n.kind === "ai").map((n) => n.id)),
