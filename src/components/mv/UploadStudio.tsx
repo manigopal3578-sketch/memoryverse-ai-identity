@@ -18,6 +18,11 @@ import {
   Building2,
   Eye,
   Plus,
+  Briefcase,
+  FolderGit2,
+  GraduationCap,
+  Globe,
+  CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { smartName, smartNameFromUrl, type SmartCategory } from "@/lib/smart-name";
@@ -54,6 +59,16 @@ interface ParsedFile {
   highlights: { id: string; text: string; label: string }[];
   proofImage?: string;
 }
+
+const catIcon: Record<SmartCategory, typeof Award> = {
+  Certificate: Award,
+  Resume: FileText,
+  Internship: Briefcase,
+  Project: FolderGit2,
+  Transcript: GraduationCap,
+  Portfolio: Globe,
+  Event: CalendarDays,
+};
 
 const catTint: Record<SmartCategory, string> = {
   Certificate: "var(--amber)",
@@ -263,6 +278,17 @@ export function UploadStudio() {
 
   const active = files.find((f) => f.id === selected) ?? files[0];
   const detail = detailFor ? files.find((f) => f.id === detailFor) : null;
+
+  useEffect(() => {
+    if (!detailFor) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDetailFor(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [detailFor]);
+
+
 
   return (
     <div className="grid gap-6 lg:grid-cols-5">
@@ -626,6 +652,7 @@ export function UploadStudio() {
                 </div>
                 <button
                   aria-label="Close details"
+                  autoFocus
                   onClick={() => setDetailFor(null)}
                   className="rounded-lg bg-white/20 p-1.5 hover:bg-white/30"
                 >
@@ -633,52 +660,150 @@ export function UploadStudio() {
                 </button>
               </div>
 
-              <div className="grid gap-4 p-5 md:grid-cols-[180px_1fr]">
-                <div
-                  className="flex h-40 items-center justify-center rounded-2xl text-white"
-                  style={{ background: `linear-gradient(160deg, ${catTint[detail.category]}, oklch(0.42 0.22 275))` }}
-                  aria-label="Proof image preview"
-                >
-                  {detail.category === "Certificate" ? <Award size={48} /> : <FileText size={48} />}
-                </div>
-                <div className="space-y-3">
-                  <div className="flex flex-wrap gap-2 text-[11px]">
-                    {detail.issuer && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1">
-                        <Building2 size={11} /> {detail.issuer}
-                      </span>
-                    )}
-                    {detail.fields.find((f) => /date/i.test(f.label)) && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1">
-                        <Calendar size={11} /> {detail.fields.find((f) => /date/i.test(f.label))?.value}
-                      </span>
-                    )}
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 font-semibold text-primary">
-                      Confidence {Math.round(detail.confidence * 100)}%
-                    </span>
+              <div className="max-h-[70vh] overflow-y-auto">
+                <div className="grid gap-4 p-5 md:grid-cols-[180px_1fr]">
+                  <div
+                    className="flex h-40 items-center justify-center rounded-2xl text-white"
+                    style={{ background: `linear-gradient(160deg, ${catTint[detail.category]}, oklch(0.42 0.22 275))` }}
+                    role="img"
+                    aria-label={`Proof image for ${detail.displayName}`}
+                  >
+                    {(() => {
+                      const Icon = catIcon[detail.category];
+                      return <Icon size={48} />;
+                    })()}
                   </div>
-
-                  <div>
-                    <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                      Extracted text
-                    </div>
-                    <p className="max-h-24 overflow-y-auto rounded-lg bg-white/60 p-2.5 text-[12px] leading-relaxed">
-                      {detail.body}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                      Related skills
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {detail.skills.map((s) => (
-                        <span key={s} className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
-                          {s}
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2 text-[11px]">
+                      {detail.issuer && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1">
+                          <Building2 size={11} /> {detail.issuer}
                         </span>
-                      ))}
+                      )}
+                      {detail.fields.find((f) => /date/i.test(f.label)) && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1">
+                          <Calendar size={11} /> {detail.fields.find((f) => /date/i.test(f.label))?.value}
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1">
+                        <ScanText size={11} /> {detail.scanned ? "OCR from image" : "Native text"}
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 font-semibold text-primary">
+                        Confidence {Math.round(detail.confidence * 100)}%
+                      </span>
+                      {detail.url && (
+                        <a
+                          href={detail.url}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1 underline"
+                        >
+                          <Link2 size={11} /> Open source link
+                        </a>
+                      )}
+                    </div>
+
+                    <div>
+                      <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                        Extracted fields · correct anything wrong
+                      </div>
+                      <div className="space-y-1.5">
+                        {detail.fields.map((f) => {
+                          const key = `detail-${detail.id}-${f.label}`;
+                          const isEditing = editing === key;
+                          return (
+                            <div key={f.label} className="flex items-center gap-2 rounded-lg bg-white/60 px-2.5 py-1.5">
+                              <div className="min-w-0 flex-1">
+                                <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{f.label}</div>
+                                {isEditing ? (
+                                  <input
+                                    autoFocus
+                                    defaultValue={f.value}
+                                    aria-label={`Correct ${f.label}`}
+                                    onBlur={(e) => {
+                                      editField(detail.id, f.label, e.target.value);
+                                      setEditing(null);
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        editField(detail.id, f.label, (e.target as HTMLInputElement).value);
+                                        setEditing(null);
+                                      }
+                                      if (e.key === "Escape") {
+                                        e.stopPropagation();
+                                        setEditing(null);
+                                      }
+                                    }}
+                                    className="mt-0.5 w-full rounded bg-white px-2 py-1 text-[12px] font-semibold"
+                                  />
+                                ) : (
+                                  <div className="truncate text-[12px] font-semibold">{f.value}</div>
+                                )}
+                              </div>
+                              <button
+                                aria-label={`Mark ${f.label} accurate`}
+                                onClick={() => setFieldFeedback(detail.id, f.label, "up")}
+                                className={cn(
+                                  "rounded p-1 transition",
+                                  f.feedback === "up" ? "bg-emerald-500/20 text-emerald-700" : "text-muted-foreground hover:bg-black/5",
+                                )}
+                              >
+                                <ThumbsUp size={12} />
+                              </button>
+                              <button
+                                aria-label={`Mark ${f.label} inaccurate`}
+                                onClick={() => setFieldFeedback(detail.id, f.label, "down")}
+                                className={cn(
+                                  "rounded p-1 transition",
+                                  f.feedback === "down" ? "bg-red-500/20 text-red-700" : "text-muted-foreground hover:bg-black/5",
+                                )}
+                              >
+                                <ThumbsDown size={12} />
+                              </button>
+                              <button
+                                aria-label={`Edit ${f.label}`}
+                                onClick={() => setEditing(key)}
+                                className="rounded p-1 text-muted-foreground hover:bg-black/5"
+                              >
+                                <Pencil size={12} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                        Related skills &amp; tags
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {detail.skills.map((s) => (
+                          <span key={s} className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                            {s}
+                          </span>
+                        ))}
+                        <span className="rounded-full bg-white/70 px-2 py-0.5 text-[11px] font-semibold">
+                          #{detail.category.toLowerCase()}
+                        </span>
+                      </div>
                     </div>
                   </div>
+                </div>
+
+                <div className="px-5 pb-5">
+                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                    Extracted text · click a highlight to jump
+                  </div>
+                  <Suspense
+                    fallback={<div className="rounded-2xl bg-white/60 p-4 text-xs text-muted-foreground">Loading viewer…</div>}
+                  >
+                    <DocumentViewer
+                      fileName={detail.displayName}
+                      body={detail.body}
+                      highlights={detail.highlights}
+                    />
+                  </Suspense>
                 </div>
               </div>
             </motion.div>
