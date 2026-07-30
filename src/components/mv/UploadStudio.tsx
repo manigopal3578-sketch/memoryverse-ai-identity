@@ -652,6 +652,7 @@ export function UploadStudio() {
                 </div>
                 <button
                   aria-label="Close details"
+                  autoFocus
                   onClick={() => setDetailFor(null)}
                   className="rounded-lg bg-white/20 p-1.5 hover:bg-white/30"
                 >
