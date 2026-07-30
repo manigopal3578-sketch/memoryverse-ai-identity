@@ -279,6 +279,17 @@ export function UploadStudio() {
   const active = files.find((f) => f.id === selected) ?? files[0];
   const detail = detailFor ? files.find((f) => f.id === detailFor) : null;
 
+  useEffect(() => {
+    if (!detailFor) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDetailFor(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [detailFor]);
+
+
+
   return (
     <div className="grid gap-6 lg:grid-cols-5">
       <div className="lg:col-span-2 space-y-4">
