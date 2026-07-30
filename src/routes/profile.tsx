@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/mv/AppShell";
 import { CornerButton } from "@/components/mv/CornerButton";
+import { CorrectionHistory } from "@/components/mv/CorrectionHistory";
 import { motion, AnimatePresence } from "framer-motion";
 import { Award, Briefcase, Code2, Download, Edit3, FileText, GraduationCap, Share2, ExternalLink, X, Copy, Check, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
-import { jsPDF } from "jspdf";
+
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -46,7 +47,8 @@ const identity = {
     "Ananya is a builder — a rare mix of designer's eye and engineer's rigor. From her first hackathon win in 2022 to a Google summer internship in 2024, every artifact tells the same quiet story: someone who ships, learns, and elevates the people around her.",
 };
 
-function generateResumePDF(name: string, tag: string) {
+async function generateResumePDF(name: string, tag: string) {
+  const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const margin = 48;
   let y = margin;
@@ -142,9 +144,9 @@ function ProfilePage() {
     }
   };
 
-  const doExport = () => {
+  const doExport = async () => {
     try {
-      generateResumePDF(name, tag);
+      await generateResumePDF(name, tag);
       toast.success("Resume PDF generated", { description: "Downloaded to your device." });
     } catch (e) {
       toast.error("Could not generate PDF");
@@ -192,7 +194,7 @@ function ProfilePage() {
                 <Share2 size={12} /> Share
               </button>
               <button onClick={doExport} className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold text-white" style={{ background: "var(--gradient-hero)" }}>
-                <Download size={12} /> Export PDF
+                <Download size={12} /> Export Profile
               </button>
             </div>
           </div>
@@ -261,6 +263,10 @@ function ProfilePage() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="mt-8">
+          <CorrectionHistory />
         </div>
 
         <div className="mt-10 flex flex-wrap gap-4">
