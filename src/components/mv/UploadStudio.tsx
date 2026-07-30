@@ -18,6 +18,11 @@ import {
   Building2,
   Eye,
   Plus,
+  Briefcase,
+  FolderGit2,
+  GraduationCap,
+  Globe,
+  CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { smartName, smartNameFromUrl, type SmartCategory } from "@/lib/smart-name";
@@ -54,6 +59,16 @@ interface ParsedFile {
   highlights: { id: string; text: string; label: string }[];
   proofImage?: string;
 }
+
+const catIcon: Record<SmartCategory, typeof Award> = {
+  Certificate: Award,
+  Resume: FileText,
+  Internship: Briefcase,
+  Project: FolderGit2,
+  Transcript: GraduationCap,
+  Portfolio: Globe,
+  Event: CalendarDays,
+};
 
 const catTint: Record<SmartCategory, string> = {
   Certificate: "var(--amber)",
