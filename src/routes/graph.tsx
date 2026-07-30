@@ -117,7 +117,7 @@ function GraphPage() {
       title={<>Every memory, <span className="text-gradient">quietly connected</span>.</>}
       subtitle="Click any node to inspect the story it belongs to."
     >
-      <div className="mx-auto max-w-6xl px-6 pb-16">
+      <div className="mx-auto max-w-7xl px-6 pb-16">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <Filter size={14} className="text-muted-foreground" />
@@ -152,8 +152,8 @@ function GraphPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
-          <div className="glass relative aspect-[16/10] w-full overflow-hidden rounded-3xl p-6">
+        <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
+          <div className="glass relative h-[560px] w-full overflow-hidden rounded-3xl p-6 md:h-[680px]">
             <motion.div animate={{ scale: zoom }} transition={{ type: "spring", stiffness: 120, damping: 20 }} className="absolute inset-0 origin-center">
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <defs>
@@ -194,7 +194,7 @@ function GraphPage() {
                     className="absolute -translate-x-1/2 -translate-y-1/2"
                     style={{ left: `${n.x}%`, top: `${n.y}%` }}
                   >
-                    <div className={cn("glass flex items-center gap-2 rounded-full px-3 py-1.5 shadow-md transition", isSel && "glow-ring scale-110", isRelated && "ring-1 ring-primary/40")}>
+                    <div className={cn("glass flex items-center gap-2 rounded-full px-3 py-1.5 shadow-md transition", isSel && "glow-ring scale-110", isRelated && "ring-1 ring-primary/40", skillMatches.has(n.id) && "ring-2 ring-amber-400")}>
                       <span className="flex h-6 w-6 items-center justify-center rounded-full text-white" style={{ background: n.tint }}>
                         <Icon size={12} />
                       </span>
