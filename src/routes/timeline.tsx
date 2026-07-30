@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/mv/AppShell";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Award, Briefcase, Code2, GraduationCap, X, FileText, Sparkles, Tag, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -112,6 +112,7 @@ const events: Event[] = [
 ];
 
 function TimelinePage() {
+  const { skill, event: eventParam } = Route.useSearch();
   const [cat, setCat] = useState<Cat>("All");
   const [year, setYear] = useState<number | "All">("All");
   const [open, setOpen] = useState<Event | null>(null);
@@ -122,10 +123,20 @@ function TimelinePage() {
   const filtered = useMemo(
     () =>
       events.filter(
-        (e) => (cat === "All" || e.category === cat) && (year === "All" || e.year === year),
+        (e) =>
+          (cat === "All" || e.category === cat) &&
+          (year === "All" || e.year === year) &&
+          (!skill || e.skills.some((s) => s.toLowerCase().includes(skill.toLowerCase()))),
       ),
-    [cat, year],
+    [cat, year, skill],
   );
+
+  useEffect(() => {
+    if (eventParam) {
+      const found = events.find((e) => e.title === eventParam);
+      if (found) setOpen(found);
+    }
+  }, [eventParam]);
 
   return (
     <AppShell
@@ -177,6 +188,13 @@ function TimelinePage() {
             ))}
           </div>
         </div>
+
+        {skill && (
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-semibold text-primary">
+            Filtered by skill · {skill}
+            <Link to="/timeline" search={{}} className="rounded-full bg-white/70 px-2 py-0.5 text-foreground">Clear</Link>
+          </div>
+        )}
 
         <div className="relative mt-10">
           <div
