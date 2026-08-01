@@ -39,7 +39,7 @@ export function HeroShowcase() {
           initial={{ opacity: 0, y: 30, scale: 0.92 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.4, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="pointer-events-none absolute -bottom-16 -left-8 z-10 hidden origin-bottom-left scale-[0.55] lg:block"
+          className="pointer-events-none absolute -bottom-28 -left-10 z-10 hidden origin-bottom-left scale-[0.55] lg:block"
         >
           <div className="pointer-events-auto">
             <Folder />
