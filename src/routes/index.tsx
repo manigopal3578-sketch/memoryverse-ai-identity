@@ -644,7 +644,9 @@ function Home() {
       <BackgroundFX />
       <Nav />
       <Hero />
+      <JudgeSection />
       <ProblemSolution />
+
       <Features />
       <Workspace />
       <UploadSection />
