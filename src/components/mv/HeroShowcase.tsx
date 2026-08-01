@@ -36,11 +36,11 @@ export function HeroShowcase() {
 
         {/* Floating Folder card, overlapping bottom-left */}
         <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.52 }}
-          animate={{ opacity: 1, y: 0, scale: 0.56 }}
+          initial={{ opacity: 0, y: 30, scale: 0.40 }}
+          animate={{ opacity: 1, y: 0, scale: 0.44 }}
           transition={{ delay: 0.4, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           style={{ originX: 0, originY: 1 }}
-          className="pointer-events-none absolute -bottom-8 -left-14 z-10 hidden lg:block"
+          className="pointer-events-none absolute -bottom-16 -left-16 z-10 hidden lg:block"
         >
           <div className="pointer-events-auto">
             <Folder />
