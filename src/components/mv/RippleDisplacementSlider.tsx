@@ -4,14 +4,31 @@ import { motion } from "framer-motion";
  * Lightweight WebGL-free ripple/displacement showcase.
  * Two blended layers with animated masks to evoke a fluid "ripple" reveal.
  */
-export function RippleDisplacementSlider() {
+export function RippleDisplacementSlider({
+  image,
+  alt,
+  aspect = "aspect-[4/3]",
+}: {
+  image?: string;
+  alt?: string;
+  aspect?: string;
+} = {}) {
   return (
-    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl glow-ring">
+    <div className={`relative ${aspect} w-full overflow-hidden rounded-3xl glow-ring`}>
       {/* Base gradient scene */}
       <div
         className="absolute inset-0"
         style={{ background: "var(--gradient-hero)" }}
       />
+      {image && (
+        <img
+          src={image}
+          alt={alt ?? "MemoryVerse AI showcase"}
+          loading="eager"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
       {/* Mesh blobs */}
       <motion.div
         className="absolute -left-20 top-10 h-72 w-72 rounded-full blur-3xl"
