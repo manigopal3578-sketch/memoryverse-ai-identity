@@ -1,0 +1,48 @@
+{
+  "id": "v3",
+  "smart_name": "Capstone: MemoryVerse AI",
+  "category": "Projects",
+  "issuer": "IIT Roorkee",
+  "date": "2024-11-10",
+  "confidence": 0.96,
+  "ocr_fallback": false,
+  "pipeline": [
+    "receive",
+    "ocr_extract",
+    "classify",
+    "embed_connect",
+    "index"
+  ],
+  "extracted_fields": [
+    {
+      "label": "Type",
+      "value": "Capstone project"
+    },
+    {
+      "label": "Stack",
+      "value": "React · LLM · Vector DB"
+    },
+    {
+      "label": "Date",
+      "value": "Nov 10, 2024"
+    }
+  ],
+  "suggested_tags": [
+    "React",
+    "LLM",
+    "Vector DB"
+  ],
+  "skills": [
+    "LLM Integration",
+    "React",
+    "Vector Search"
+  ],
+  "graph_node": "proj1",
+  "timeline_event": "Capstone: MemoryVerse AI",
+  "embedding": {
+    "model": "local-deterministic-hash-384",
+    "dims": 384,
+    "store": "file-backed mock (exports/index.json)"
+  },
+  "extracted_text": "An AI-native personal identity vault built with React, an LLM pipeline and a vector database. It ingests any document with 96% classification confidence, performs semantic search across 1,200 seed documents, and constructs an identity graph with sub-second latency. Selected for the university showcase."
+}

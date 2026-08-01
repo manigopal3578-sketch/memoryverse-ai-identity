@@ -1,0 +1,47 @@
+{
+  "id": "v2",
+  "smart_name": "AWS Cloud Practitioner Certificate",
+  "category": "Certificates",
+  "issuer": "Amazon Web Services",
+  "date": "2023-08-02",
+  "confidence": 0.94,
+  "ocr_fallback": true,
+  "pipeline": [
+    "receive",
+    "ocr_extract",
+    "classify",
+    "embed_connect",
+    "index"
+  ],
+  "extracted_fields": [
+    {
+      "label": "Issuer",
+      "value": "Amazon Web Services"
+    },
+    {
+      "label": "Credential",
+      "value": "CLF-C02 · Verified"
+    },
+    {
+      "label": "Date",
+      "value": "Aug 2, 2023"
+    }
+  ],
+  "suggested_tags": [
+    "Cloud",
+    "AWS"
+  ],
+  "skills": [
+    "AWS",
+    "Cloud",
+    "Security"
+  ],
+  "graph_node": "cert2",
+  "timeline_event": null,
+  "embedding": {
+    "model": "local-deterministic-hash-384",
+    "dims": 384,
+    "store": "file-backed mock (exports/index.json)"
+  },
+  "extracted_text": "Awarded for demonstrating a foundational understanding of AWS Cloud, security, architecture, pricing and support. Verified credential covering cloud deployment models and shared responsibility."
+}

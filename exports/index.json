@@ -1,0 +1,118 @@
+{
+  "generated_by": "MemoryVerse AI local pipeline (deterministic mock)",
+  "count": 10,
+  "documents": [
+    {
+      "id": "v1",
+      "file": "v1-certificates.json",
+      "smart_name": "Stanford Machine Learning Certificate",
+      "category": "Certificates",
+      "confidence": 0.98,
+      "tags": [
+        "ML",
+        "Python",
+        "Certificate"
+      ]
+    },
+    {
+      "id": "v2",
+      "file": "v2-certificates.json",
+      "smart_name": "AWS Cloud Practitioner Certificate",
+      "category": "Certificates",
+      "confidence": 0.94,
+      "tags": [
+        "Cloud",
+        "AWS"
+      ]
+    },
+    {
+      "id": "v3",
+      "file": "v3-projects.json",
+      "smart_name": "Capstone: MemoryVerse AI",
+      "category": "Projects",
+      "confidence": 0.96,
+      "tags": [
+        "React",
+        "LLM",
+        "Vector DB"
+      ]
+    },
+    {
+      "id": "v4",
+      "file": "v4-projects.json",
+      "smart_name": "Realtime Chat App",
+      "category": "Projects",
+      "confidence": 0.9,
+      "tags": [
+        "React",
+        "WebSockets"
+      ]
+    },
+    {
+      "id": "v5",
+      "file": "v5-internships.json",
+      "smart_name": "Google Summer Internship Letter",
+      "category": "Internships",
+      "confidence": 0.99,
+      "tags": [
+        "Google",
+        "SWE"
+      ]
+    },
+    {
+      "id": "v6",
+      "file": "v6-internships.json",
+      "smart_name": "Microsoft Winter Internship Letter",
+      "category": "Internships",
+      "confidence": 0.93,
+      "tags": [
+        "Microsoft",
+        "Cloud"
+      ]
+    },
+    {
+      "id": "v7",
+      "file": "v7-resumes.json",
+      "smart_name": "Resume — Placement Ready v3",
+      "category": "Resumes",
+      "confidence": 0.97,
+      "tags": [
+        "Resume",
+        "AI-polished"
+      ]
+    },
+    {
+      "id": "v8",
+      "file": "v8-academics.json",
+      "smart_name": "B.Tech Semester 6 Transcript",
+      "category": "Academics",
+      "confidence": 0.99,
+      "tags": [
+        "Academics",
+        "Transcript"
+      ]
+    },
+    {
+      "id": "v9",
+      "file": "v9-certificates.json",
+      "smart_name": "GDG DevFest — Speaker Proof",
+      "category": "Certificates",
+      "confidence": 0.88,
+      "tags": [
+        "Speaking",
+        "Community"
+      ]
+    },
+    {
+      "id": "v10",
+      "file": "v10-projects.json",
+      "smart_name": "Portfolio Site — v4",
+      "category": "Projects",
+      "confidence": 0.91,
+      "tags": [
+        "Portfolio",
+        "TanStack"
+      ]
+    }
+  ]
+}

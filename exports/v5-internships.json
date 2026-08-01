@@ -1,0 +1,47 @@
+{
+  "id": "v5",
+  "smart_name": "Google Summer Internship Letter",
+  "category": "Internships",
+  "issuer": "Google India",
+  "date": "2024-06-01",
+  "confidence": 0.99,
+  "ocr_fallback": false,
+  "pipeline": [
+    "receive",
+    "ocr_extract",
+    "classify",
+    "embed_connect",
+    "index"
+  ],
+  "extracted_fields": [
+    {
+      "label": "Organization",
+      "value": "Google India"
+    },
+    {
+      "label": "Role",
+      "value": "Software Engineering Intern"
+    },
+    {
+      "label": "Date",
+      "value": "Jun 1, 2024"
+    }
+  ],
+  "suggested_tags": [
+    "Google",
+    "SWE"
+  ],
+  "skills": [
+    "Search",
+    "System Design",
+    "A/B Testing"
+  ],
+  "graph_node": "intern1",
+  "timeline_event": "Google summer internship",
+  "embedding": {
+    "model": "local-deterministic-hash-384",
+    "dims": 384,
+    "store": "file-backed mock (exports/index.json)"
+  },
+  "extracted_text": "Offer of internship for the role of Software Engineering Intern with the Search Quality org in Bangalore, from June to August 2024. The intern shipped a ranking-quality experiment to 1% traffic, was recognized as a top-15% intern and received a return offer. Skills applied: System Design, A/B Testing."
+}

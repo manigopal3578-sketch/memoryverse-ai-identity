@@ -1,0 +1,47 @@
+{
+  "id": "v4",
+  "smart_name": "Realtime Chat App",
+  "category": "Projects",
+  "issuer": "Personal",
+  "date": "2023-03-18",
+  "confidence": 0.9,
+  "ocr_fallback": false,
+  "pipeline": [
+    "receive",
+    "ocr_extract",
+    "classify",
+    "embed_connect",
+    "index"
+  ],
+  "extracted_fields": [
+    {
+      "label": "Type",
+      "value": "Side project"
+    },
+    {
+      "label": "Scale",
+      "value": "400 daily active students"
+    },
+    {
+      "label": "Date",
+      "value": "Mar 18, 2023"
+    }
+  ],
+  "suggested_tags": [
+    "React",
+    "WebSockets"
+  ],
+  "skills": [
+    "React",
+    "WebSockets",
+    "Node.js"
+  ],
+  "graph_node": "proj2",
+  "timeline_event": "Realtime chat app",
+  "embedding": {
+    "model": "local-deterministic-hash-384",
+    "dims": 384,
+    "store": "file-backed mock (exports/index.json)"
+  },
+  "extracted_text": "A low-latency messaging system built with React, WebSockets and Node.js serving 400 concurrent classmates, with typing indicators and message reactions. Sub-80ms message latency, open-sourced on GitHub with 210 stars."
+}

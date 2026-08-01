@@ -1,0 +1,47 @@
+{
+  "id": "v6",
+  "smart_name": "Microsoft Winter Internship Letter",
+  "category": "Internships",
+  "issuer": "Microsoft India",
+  "date": "2023-12-14",
+  "confidence": 0.93,
+  "ocr_fallback": false,
+  "pipeline": [
+    "receive",
+    "ocr_extract",
+    "classify",
+    "embed_connect",
+    "index"
+  ],
+  "extracted_fields": [
+    {
+      "label": "Organization",
+      "value": "Microsoft India"
+    },
+    {
+      "label": "Role",
+      "value": "Cloud Intern"
+    },
+    {
+      "label": "Date",
+      "value": "Dec 14, 2023"
+    }
+  ],
+  "suggested_tags": [
+    "Microsoft",
+    "Cloud"
+  ],
+  "skills": [
+    "TypeScript",
+    "Azure",
+    "Code Review"
+  ],
+  "graph_node": "intern2",
+  "timeline_event": "Microsoft winter internship",
+  "embedding": {
+    "model": "local-deterministic-hash-384",
+    "dims": 384,
+    "store": "file-backed mock (exports/index.json)"
+  },
+  "extracted_text": "Confirmation of a six-week winter internship in Hyderabad. Contributed to Azure Data Studio extensions in TypeScript, delivered two production PRs, presented at intern demo day and received a strong-hire rating from the manager."
+}

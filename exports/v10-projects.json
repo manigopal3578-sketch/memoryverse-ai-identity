@@ -1,0 +1,47 @@
+{
+  "id": "v10",
+  "smart_name": "Portfolio Site — v4",
+  "category": "Projects",
+  "issuer": "Personal",
+  "date": "2024-09-11",
+  "confidence": 0.91,
+  "ocr_fallback": false,
+  "pipeline": [
+    "receive",
+    "ocr_extract",
+    "classify",
+    "embed_connect",
+    "index"
+  ],
+  "extracted_fields": [
+    {
+      "label": "Type",
+      "value": "Personal site"
+    },
+    {
+      "label": "Stack",
+      "value": "TanStack Start · React"
+    },
+    {
+      "label": "Date",
+      "value": "Sep 11, 2024"
+    }
+  ],
+  "suggested_tags": [
+    "Portfolio",
+    "TanStack"
+  ],
+  "skills": [
+    "React",
+    "Performance",
+    "Design"
+  ],
+  "graph_node": "skill1",
+  "timeline_event": null,
+  "embedding": {
+    "model": "local-deterministic-hash-384",
+    "dims": 384,
+    "store": "file-backed mock (exports/index.json)"
+  },
+  "extracted_text": "A lightweight portfolio built with TanStack Start and React. Core web vitals are green across mobile and desktop, with a focus on Performance and Design."
+}

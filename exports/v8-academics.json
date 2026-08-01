@@ -1,0 +1,46 @@
+{
+  "id": "v8",
+  "smart_name": "B.Tech Semester 6 Transcript",
+  "category": "Academics",
+  "issuer": "IIT Roorkee",
+  "date": "2024-05-20",
+  "confidence": 0.99,
+  "ocr_fallback": false,
+  "pipeline": [
+    "receive",
+    "ocr_extract",
+    "classify",
+    "embed_connect",
+    "index"
+  ],
+  "extracted_fields": [
+    {
+      "label": "Institution",
+      "value": "IIT Roorkee"
+    },
+    {
+      "label": "CGPA",
+      "value": "9.1"
+    },
+    {
+      "label": "Date",
+      "value": "May 20, 2024"
+    }
+  ],
+  "suggested_tags": [
+    "Academics",
+    "Transcript"
+  ],
+  "skills": [
+    "Algorithms",
+    "Distributed Systems"
+  ],
+  "graph_node": "deg",
+  "timeline_event": "Started B.Tech CSE",
+  "embedding": {
+    "model": "local-deterministic-hash-384",
+    "dims": 384,
+    "store": "file-backed mock (exports/index.json)"
+  },
+  "extracted_text": "Verified digital transcript with grades in Distributed Systems, Machine Learning and Compiler Design. Cumulative CGPA of 9.1 across six semesters of the CS honours track."
+}

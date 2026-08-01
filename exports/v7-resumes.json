@@ -1,0 +1,47 @@
+{
+  "id": "v7",
+  "smart_name": "Resume — Placement Ready v3",
+  "category": "Resumes",
+  "issuer": "MemoryVerse AI",
+  "date": "2026-07-27",
+  "confidence": 0.97,
+  "ocr_fallback": false,
+  "pipeline": [
+    "receive",
+    "ocr_extract",
+    "classify",
+    "embed_connect",
+    "index"
+  ],
+  "extracted_fields": [
+    {
+      "label": "Version",
+      "value": "v3 · AI polished"
+    },
+    {
+      "label": "Length",
+      "value": "1 page"
+    },
+    {
+      "label": "Date",
+      "value": "Jul 27, 2026"
+    }
+  ],
+  "suggested_tags": [
+    "Resume",
+    "AI-polished"
+  ],
+  "skills": [
+    "React",
+    "TypeScript",
+    "Product"
+  ],
+  "graph_node": "ai",
+  "timeline_event": null,
+  "embedding": {
+    "model": "local-deterministic-hash-384",
+    "dims": 384,
+    "store": "file-backed mock (exports/index.json)"
+  },
+  "extracted_text": "An AI-composed one-page resume highlighting Google, Microsoft and MemoryVerse, with 6 top skills ranked by evidence: React, TypeScript, Python, ML, System Design and Product."
+}
