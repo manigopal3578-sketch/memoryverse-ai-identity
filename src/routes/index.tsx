@@ -30,8 +30,9 @@ import {
 import { toast } from "sonner";
 import { FlipText } from "@/components/mv/FlipText";
 import { CornerButton } from "@/components/mv/CornerButton";
-import { RippleDisplacementSlider } from "@/components/mv/RippleDisplacementSlider";
-import { Folder } from "@/components/mv/Folder";
+import { HeroShowcase } from "@/components/mv/HeroShowcase";
+import { JudgeSection } from "@/components/mv/JudgeNotes";
+
 import { AgentBentoGrid } from "@/components/mv/AgentBentoGrid";
 import { GlassDock } from "@/components/mv/GlassDock";
 import { TestimonialsCard } from "@/components/mv/TestimonialsCard";
