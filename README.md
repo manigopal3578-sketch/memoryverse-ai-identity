@@ -1,344 +1,138 @@
-# MemoryVerse AI
-
-Build a next-level premium hackathon website called “MemoryVerse AI” — an AI-powered Digital Identity System for students.
-
-
-
-GOAL
-
-Create a stunning, modern, judge-friendly, student-loved website that transforms scattered academic and professional documents into a beautiful intelligent identity system. The website should feel like a full upgraded product, not a simple prototype. It must look incredible, emotionally warm, premium, and memorable — like a first-place hackathon submission.
-
-
-
-PRODUCT IDEA
-
-Students upload certificates, resumes, project reports, internship letters, academic records, portfolio links, and achievements. The AI automatically extracts text, categorizes documents, connects related items, builds a timeline, generates a student profile summary, and supports semantic search. The website should present this as a magical, intelligent, and useful experience.
-
-
-
-VISUAL STYLE
-
-- Use a premium futuristic student aesthetic.
-
-- Do NOT use boring default colors.
-
-- Use a refined palette inspired by electric violet, deep indigo, soft white, icy blue, mint green, warm amber, and subtle pink highlights.
-
-- Use white space beautifully.
-
-- Use soft gradients, glassmorphism, blurred panels, thin borders, glowing edges, and elegant shadows.
-
-- Make the UI feel expensive, modern, and emotionally appealing.
-
-- Add warm human touches so it feels lovable, bonding, and inspiring, not cold or robotic.
-
-- Keep the website extremely polished and visually balanced.
-
-- Make every section feel intentional and award-worthy.
-
-
-
-ANIMATION STYLE
-
-- Add perfect motion everywhere, but keep it elegant and smooth.
-
-- Use Framer Motion style transitions, GSAP-style depth, hover expansion, gentle parallax, soft reveal animations, floating elements, ripple effects, glow pulses, and subtle 3D movement.
-
-- Add scroll-based reveal animations.
-
-- Add text split animations, staggered entrances, card lift-on-hover, and premium microinteractions.
-
-- Add beautiful animated backgrounds with soft particles, gradients, mesh glow, and depth layers.
-
-- Make transitions feel cinematic but not distracting.
-
-- The user should feel “wow” at first glance.
-
-
-
-USE MY COMPONENTS
-
-Use the components I have provided in this chat and integrate them into the website naturally:
-
-- Use CornerButton for all primary CTA buttons.
-
-- Use FlipText for animated hero text and section headlines.
-
-- Use RippleDisplacementSlider for the hero showcase or featured story section.
-
-- Use AgentBentoGrid for the AI workspace / dashboard / feature section.
-
-- Use GlassDock as a floating bottom quick-action dock.
-
-- Use TestimonialsCard for student quotes, demo highlights, or social proof.
-
-- Use Folder component for a magical file upload / file stack / document vault visual.
-
-- Use all extra motion and 3D-style components where they improve the experience.
-
-- Make them all feel like one unified design system.
-
-
-
-WEBSITE STRUCTURE
-
-1. HERO SECTION
-
-- Big animated headline with FlipText.
-
-- Subheadline explaining the AI digital identity system.
-
-- One strong primary CornerButton CTA.
-
-- One secondary CTA.
-
-- Premium hero visual using RippleDisplacementSlider or a 3D motion showcase.
-
-- Floating folder/file visual using the Folder component.
-
-- Add subtle background particles and soft gradient blobs.
-
-- The hero must instantly communicate value and impress judges.
-
-
-
-2. PROBLEM + SOLUTION SECTION
-
-- Show the problem: scattered files, messy folders, lost certificates, hard-to-find proof.
-
-- Show the solution: one smart memory vault.
-
-- Use 2–3 beautiful cards with icon animations.
-
-- Keep copy simple, emotional, and clean.
-
-
-
-3. CORE FEATURES SECTION
-
-- Smart upload.
-
-- AI categorization.
-
-- Semantic search.
-
-- Timeline visualization.
-
-- Relationship graph.
-
-- AI profile summary.
-
-- Skill extraction.
-
-- Resume builder / portfolio generator if needed.
-
-- Use elegant cards with motion and a premium layout.
-
-
-
-4. AI WORKSPACE / DASHBOARD SECTION
-
-- Use AgentBentoGrid as the center of the product page or dashboard preview.
-
-- Repurpose the cards as:
-
-  - Upload pipeline.
-
-  - Extraction and processing monitor.
-
-  - Activity feed.
-
-  - Knowledge base / search log.
-
-  - Tool inspector / AI modules.
-
-- Make it feel like a real intelligent control center.
-
-
-
-5. QUICK ACTION DOCK
-
-- Add GlassDock as a floating bottom dock.
-
-- Include icons for Upload, Search, Timeline, Graph, Profile, and Share.
-
-- Show gorgeous hover tooltips.
-
-- Make it feel like a premium command center.
-
-
-
-6. UPLOAD EXPERIENCE
-
-- Create a visually rich upload section.
-
-- Allow drag-and-drop file handling.
-
-- Show a beautiful vault / folder / stack animation.
-
-- Display upload progress, parsing, extracted categories, and success states.
-
-
-
-7. INTELLIGENCE / KNOWLEDGE GRAPH SECTION
-
-- Show how documents connect:
-
-  certificate → skill → project → internship → achievement.
-
-- Use a timeline and graph-like visual.
-
-- Show connected nodes and elegant motion.
-
-- Make AI reasoning visible in a simple, beautiful way.
-
-
-
-8. TESTIMONIALS / SOCIAL PROOF
-
-- Use TestimonialsCard for short student testimonials, demo reactions, or product praise.
-
-- Keep it clean, inspirational, and trustworthy.
-
-
-
-9. FINAL CTA SECTION
-
-- End with a powerful call to action.
-
-- The button must feel premium and memorable.
-
-- Reinforce that this is the easiest way to turn scattered documents into a digital identity.
-
-
-
-DESIGN PRINCIPLES
-
-- Clean, modern, premium, elegant.
-
-- Student-friendly and emotionally warm.
-
-- Judges should understand it in 5 seconds.
-
-- Avoid clutter.
-
-- Avoid generic template-looking UI.
-
-- Everything must feel connected and cohesive.
-
-- Prioritize visual hierarchy.
-
-- Use beautiful spacing and typography.
-
-- Make the app feel like the “first place” project.
-
-
-
-MOTION GUIDELINES
-
-- Every major section should have its own motion identity.
-
-- Hero: cinematic reveal.
-
-- Cards: hover lift + glow.
-
-- Buttons: glow pulse and subtle scaling.
-
-- Dock: tooltip motion and soft bounce.
-
-- Upload area: smooth file drop animation.
-
-- Graph section: connected pulse and node expansion.
-
-- Background: slow floating layers and gentle depth movement.
-
-
-
-COLOR SYSTEM
-
-Use a unique student-premium palette:
-
-- Primary: electric violet / indigo.
-
-- Secondary: icy blue / cyan.
-
-- Accent: mint green / soft teal.
-
-- Highlight: warm amber / gold.
-
-- Support: soft pink / rose glow.
-
-- Base: clean white, off-white, deep charcoal, and soft neutral gray.
-
-- Use gradients instead of flat boring colors.
-
-- Make the palette feel expensive, playful, and intelligent.
-
-
-
-CONTENT TONE
-
-- Warm.
-
-- Inspiring.
-
-- Smart.
-
-- Student-centered.
-
-- Hackathon-winning.
-
-- Emotional but not cheesy.
-
-- Confident and memorable.
-
-
-
-TECH EXPECTATIONS
-
-- Build as a polished responsive website.
-
-- Use modern React / Next.js style structure.
-
-- Make components reusable.
-
-- Make it production-like enough for a hackathon demo.
-
-- Ensure desktop and mobile both look excellent.
-
-- Use smooth responsive layouts and elegant spacing.
-
-
-
-CRITICAL REQUIREMENT
-
-This website should feel like a fully upgraded next-generation AI product that students would love and judges would remember. It must look magical, professional, and award-worthy. The final result should feel unlike any ordinary website.
-
-
-
-OUTPUT REQUIREMENT
-
-Generate the full website structure, all major sections, all UI states, all animations, and all necessary content in one complete build.
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://memoryverse-ai-identity.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/a115c577-9700-41bb-a01d-14b38677d45c).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+# MemoryVerse AI — Student Digital Identity System
+
+> From scattered files to a smart digital identity.
+> Upload → Extract → Classify → Embed & Connect → Search → Profile.
+
+MemoryVerse AI turns a student's scattered certificates, resumes, project reports and
+internship letters into one searchable, explainable, privacy-preserving digital identity.
+
+**Live demo:** https://memoryverse-ai-identity.lovable.app
+
+---
+
+## Judge Demo Script (3 minutes)
+
+1. **Upload** — open `/upload`, drag-drop a certificate PDF/PNG (or paste a portfolio URL).
+2. **Watch the pipeline** — Receive → OCR/Extract → Classify → Embed & Connect → Index.
+   Note the smart auto-name, extracted fields, confidence score and OCR-fallback badge.
+   Then open the new item in `/timeline`.
+3. **Search** — go to `/search`, ask *"Show my React projects"*. Open a snippet card;
+   the detail modal shows the grounded source text with clickable AI highlights.
+4. **Graph + export** — open `/graph`, click a node to see its story panel and related
+   documents, then go to `/profile` and click **Export Profile** to download the PDF resume.
+
+A "Judge Notes" card summarising architecture, honesty about mocks, and a 60-second
+validation path is rendered directly on the landing page (`#judges`).
+
+---
+
+## Architecture
+
+```text
+                ┌──────────────────────────────────────────────┐
+  Browser  ──►  │  TanStack Start (React 19, Vite 7, Tailwind)  │
+                │  routes: / /upload /search /timeline /graph   │
+                │          /profile                            │
+                └───────────────┬──────────────────────────────┘
+                                │
+                 ┌──────────────▼───────────────┐
+                 │  Processing pipeline (local) │
+                 │  1 receive   (file/URL)      │
+                 │  2 ocr/extract (+fallback)   │
+                 │  3 classify  (category/NER)  │
+                 │  4 embed & connect (vectors) │
+                 │  5 index     (vault + graph) │
+                 └──────────────┬───────────────┘
+                                │
+      ┌───────────────┬─────────┴─────────┬──────────────────┐
+      ▼               ▼                   ▼                  ▼
+ Vault registry   Vector index      Knowledge graph      Corrections log
+ src/lib/         (file-backed      (nodes + edges)      (audit of edits
+ vault-data.ts     mock)                                  and 👍/👎)
+      │
+      └──► exports/*.json  ← real, inspectable processed outputs per demo doc
+```
+
+Key modules:
+
+| Path | Role |
+| --- | --- |
+| `src/components/mv/UploadStudio.tsx` | Drag-drop + URL import, live 5-stage pipeline, per-field 👍/👎 and inline edit |
+| `src/lib/smart-name.ts` | File-type detection and smart auto-naming ("Certificate — Cipher AI") |
+| `src/lib/vault-data.ts` | Vault registry of 10 preloaded demo documents with fields, tags, skills, confidence |
+| `src/lib/mv-store.ts` | Corrections history store (before/after word diffs + timestamps) |
+| `src/components/mv/DocumentViewer.tsx` | Lazy-loaded viewer with keyboard-navigable highlight spans |
+| `src/components/mv/KnowledgeGraph.tsx` | Interactive graph: zoom, pan, reset, filters, node detail panel |
+| `src/routes/search.tsx` | Semantic search: filters, sorting, pagination, keyboard navigation |
+| `src/routes/profile.tsx` | Identity score, PDF resume export (jsPDF, lazy-loaded), share link preview |
+| `exports/` | Processed JSON artifact for every demo document + `index.json` manifest |
+
+---
+
+## Honest scope: what is real vs. simulated
+
+This build ships **no proprietary LLM keys** and requires none.
+
+| Capability | Status |
+| --- | --- |
+| Upload, type detection, smart naming | Real, in-browser |
+| 5-stage pipeline UI + per-stage progress | Real UI over a deterministic local processor |
+| OCR text extraction / OCR-fallback badge | **Simulated deterministically** (no Tesseract binary in the browser runtime) |
+| Entity extraction (issuer, date, skills) | **Simulated deterministically** from document fixtures |
+| Embeddings + vector similarity | **File-backed mock** (deterministic scoring), not ChromaDB/pgvector |
+| RAG answers | Grounded to stored documents; snippets always cite their source document |
+| Timeline / graph / search / profile updates | Real — driven by the same store the uploads write to |
+| PDF resume export, share link | Real (jsPDF, clipboard) |
+
+Every simulated stage writes a **real artifact** — see `exports/` — so judges can inspect
+the exact processed output for each demo document rather than trusting the UI.
+
+To swap in a real backend, replace the pipeline calls in `UploadStudio.tsx` with
+`POST /upload`, `GET /search`, `GET /graph` endpoints (FastAPI + PyPDF + Tesseract +
+ChromaDB) — the front end already consumes exactly that shape (see `exports/index.json`).
+
+---
+
+## Run locally
 
 ```sh
 git clone <this-repository-url>
 cd <repository-name>
 npm i
-npm run dev
+npm run dev          # http://localhost:8080
+npm run build        # production build
 ```
+
+Copy `.env.example` to `.env` if you wire in a real backend. No keys are needed for the demo.
+
+---
+
+## Demo data
+
+10 preloaded demo documents ship with the app (certificates, projects, internship
+letters, resume, transcript, event proof, portfolio link). Their processed outputs live in
+`exports/` — one JSON per document plus `exports/index.json`.
+
+## Demo video / GIF
+
+A 30–60s screen capture of *upload → pipeline → timeline → graph → resume export* should be
+placed at `docs/demo.gif` and linked here. **Not included in this repo** — record it from the
+live demo using the Judge Demo Script above.
+
+---
+
+## Final verification checklist
+
+- [x] Upload pipeline works and shows 5 stages.
+- [x] OCR fallback badge visible for scanned images.
+- [x] Extracted fields and confidence displayed; inline edits logged to correction history.
+- [x] Embeddings created (deterministic mock) and search returns grounded snippets with sources.
+- [x] Knowledge graph and timeline update from uploads.
+- [x] Profile PDF export works; share copies URL and shows a link preview.
+- [x] All interactive elements keyboard-accessible with visible `:focus-visible` rings.
+- [x] README with architecture, run steps, honest mock disclosure and sample outputs.
+- [ ] Demo GIF/video included (record from the live demo — see above).
+
+## Built with
+
+TanStack Start · React 19 · TypeScript · Tailwind CSS v4 · Framer Motion · jsPDF · Lucide

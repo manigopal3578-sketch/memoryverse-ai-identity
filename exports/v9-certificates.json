@@ -1,0 +1,46 @@
+{
+  "id": "v9",
+  "smart_name": "GDG DevFest — Speaker Proof",
+  "category": "Certificates",
+  "issuer": "Google Developer Groups",
+  "date": "2024-10-05",
+  "confidence": 0.88,
+  "ocr_fallback": true,
+  "pipeline": [
+    "receive",
+    "ocr_extract",
+    "classify",
+    "embed_connect",
+    "index"
+  ],
+  "extracted_fields": [
+    {
+      "label": "Event",
+      "value": "GDG DevFest 2024"
+    },
+    {
+      "label": "Role",
+      "value": "Speaker"
+    },
+    {
+      "label": "Date",
+      "value": "Oct 5, 2024"
+    }
+  ],
+  "suggested_tags": [
+    "Speaking",
+    "Community"
+  ],
+  "skills": [
+    "Public Speaking",
+    "Product"
+  ],
+  "graph_node": "ai",
+  "timeline_event": null,
+  "embedding": {
+    "model": "local-deterministic-hash-384",
+    "dims": 384,
+    "store": "file-backed mock (exports/index.json)"
+  },
+  "extracted_text": "Certificate of appreciation for delivering a 25-minute talk on building AI-native student products to an audience of 300+ developers at GDG DevFest."
+}

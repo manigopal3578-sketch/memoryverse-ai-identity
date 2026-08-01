@@ -30,8 +30,9 @@ import {
 import { toast } from "sonner";
 import { FlipText } from "@/components/mv/FlipText";
 import { CornerButton } from "@/components/mv/CornerButton";
-import { RippleDisplacementSlider } from "@/components/mv/RippleDisplacementSlider";
-import { Folder } from "@/components/mv/Folder";
+import { HeroShowcase } from "@/components/mv/HeroShowcase";
+import { JudgeSection } from "@/components/mv/JudgeNotes";
+
 import { AgentBentoGrid } from "@/components/mv/AgentBentoGrid";
 import { GlassDock } from "@/components/mv/GlassDock";
 import { TestimonialsCard } from "@/components/mv/TestimonialsCard";
@@ -223,16 +224,9 @@ function Hero() {
           </div>
 
           <div className="relative">
-            <RippleDisplacementSlider />
-            <motion.div
-              initial={{ opacity: 0, y: 40, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: 0.4, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute -bottom-20 -left-6 hidden md:block"
-            >
-              <Folder />
-            </motion.div>
+            <HeroShowcase />
           </div>
+
         </div>
       </div>
     </section>
@@ -650,7 +644,9 @@ function Home() {
       <BackgroundFX />
       <Nav />
       <Hero />
+      <JudgeSection />
       <ProblemSolution />
+
       <Features />
       <Workspace />
       <UploadSection />

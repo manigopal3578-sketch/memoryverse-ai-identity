@@ -1,0 +1,48 @@
+{
+  "id": "v1",
+  "smart_name": "Stanford Machine Learning Certificate",
+  "category": "Certificates",
+  "issuer": "Coursera · Stanford",
+  "date": "2024-04-12",
+  "confidence": 0.98,
+  "ocr_fallback": true,
+  "pipeline": [
+    "receive",
+    "ocr_extract",
+    "classify",
+    "embed_connect",
+    "index"
+  ],
+  "extracted_fields": [
+    {
+      "label": "Issuer",
+      "value": "Stanford Online via Coursera"
+    },
+    {
+      "label": "Grade",
+      "value": "A · 11 assignments"
+    },
+    {
+      "label": "Date",
+      "value": "Apr 12, 2024"
+    }
+  ],
+  "suggested_tags": [
+    "ML",
+    "Python",
+    "Certificate"
+  ],
+  "skills": [
+    "Python",
+    "PyTorch",
+    "ML Theory"
+  ],
+  "graph_node": "cert1",
+  "timeline_event": "Stanford ML certificate",
+  "embedding": {
+    "model": "local-deterministic-hash-384",
+    "dims": 384,
+    "store": "file-backed mock (exports/index.json)"
+  },
+  "extracted_text": "This is to certify that the recipient completed the Machine Learning specialization with Grade A. Coursework covered Python, PyTorch, supervised learning, unsupervised learning and reinforcement learning. The final project was an emotion classifier reaching 92% F1, peer-reviewed across 20 submissions."
+}
