@@ -14,7 +14,173 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      corrections: {
+        Row: {
+          after_text: string
+          before_text: string
+          created_at: string
+          document_id: string | null
+          field_label: string
+          id: string
+          item_title: string
+          kind: string
+          rating: string | null
+          user_id: string
+        }
+        Insert: {
+          after_text?: string
+          before_text?: string
+          created_at?: string
+          document_id?: string | null
+          field_label?: string
+          id?: string
+          item_title?: string
+          kind?: string
+          rating?: string | null
+          user_id: string
+        }
+        Update: {
+          after_text?: string
+          before_text?: string
+          created_at?: string
+          document_id?: string | null
+          field_label?: string
+          id?: string
+          item_title?: string
+          kind?: string
+          rating?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corrections_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          category: string
+          confidence: number
+          created_at: string
+          doc_date: string
+          extracted_text: string
+          fields: Json
+          file_name: string | null
+          file_path: string | null
+          file_size: number | null
+          file_type: string | null
+          graph_node: string | null
+          id: string
+          is_demo: boolean
+          issuer: string
+          skills: Json
+          snippet: string
+          tags: Json
+          timeline_event: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          confidence?: number
+          created_at?: string
+          doc_date?: string
+          extracted_text?: string
+          fields?: Json
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          graph_node?: string | null
+          id?: string
+          is_demo?: boolean
+          issuer?: string
+          skills?: Json
+          snippet?: string
+          tags?: Json
+          timeline_event?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          confidence?: number
+          created_at?: string
+          doc_date?: string
+          extracted_text?: string
+          fields?: Json
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          graph_node?: string | null
+          id?: string
+          is_demo?: boolean
+          issuer?: string
+          skills?: Json
+          snippet?: string
+          tags?: Json
+          timeline_event?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string
+          created_at: string
+          education: Json
+          email: string
+          full_name: string
+          headline: string
+          id: string
+          location: string
+          settings: Json
+          skills: Json
+          social_links: Json
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string
+          created_at?: string
+          education?: Json
+          email?: string
+          full_name?: string
+          headline?: string
+          id: string
+          location?: string
+          settings?: Json
+          skills?: Json
+          social_links?: Json
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string
+          created_at?: string
+          education?: Json
+          email?: string
+          full_name?: string
+          headline?: string
+          id?: string
+          location?: string
+          settings?: Json
+          skills?: Json
+          social_links?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
