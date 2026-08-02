@@ -45,7 +45,8 @@ export function AvatarBubble({ size = 28 }: { size?: number }) {
 }
 
 export function AuthButton() {
-  const { user, signInWithGoogle, signOut, loading } = useAuth();
+  const { user, profile, signInWithGoogle, signOut, loading } = useAuth();
+  const displayName = profile?.full_name || user?.email?.split("@")[0] || "Student";
 
   if (loading) {
     return <span className="h-7 w-20 animate-pulse rounded-xl bg-white/50" aria-hidden />;
@@ -72,7 +73,7 @@ export function AuthButton() {
       >
         <AvatarBubble />
         <span className="hidden max-w-[110px] truncate sm:inline">
-          {useAuthName()}
+          {displayName}
         </span>
       </Link>
       <button
@@ -84,11 +85,6 @@ export function AuthButton() {
       </button>
     </div>
   );
-}
-
-function useAuthName() {
-  const { profile, user } = useAuth();
-  return profile?.full_name || user?.email?.split("@")[0] || "Student";
 }
 
 export function SignedOutNotice({ what }: { what: string }) {
