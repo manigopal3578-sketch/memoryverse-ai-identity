@@ -159,6 +159,16 @@ export function UploadStudio() {
   const timers = useRef<Record<string, ReturnType<typeof setInterval>>>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+  const dbCategory = (c: SmartCategory) =>
+    ({
+      Certificate: "Certificates",
+      Resume: "Resumes",
+      Internship: "Internships",
+      Project: "Projects",
+      Transcript: "Academics",
+      Portfolio: "Projects",
+      Event: "Events",
+    })[c] ?? "Certificates";
   const { upsertLocal } = useLibrary();
 
   /** Persists a picked file (and its AI-extracted metadata) to the signed-in student's vault. */
@@ -169,7 +179,7 @@ export function UploadStudio() {
         const path = await uploadDocumentFile(user.id, raw);
         const saved = await createDocument(user.id, {
           title: parsed.displayName,
-          category: parsed.category === "Resume" ? "Resumes" : `${parsed.category}s`.replace("ss", "s"),
+          category: dbCategory(parsed.category),
           issuer: parsed.issuer ?? "",
           doc_date: new Date().toISOString().slice(0, 10),
           extracted_text: parsed.body,
@@ -198,7 +208,7 @@ export function UploadStudio() {
       try {
         const saved = await createDocument(user.id, {
           title: parsed.displayName,
-          category: parsed.category === "Resume" ? "Resumes" : `${parsed.category}s`.replace("ss", "s"),
+          category: dbCategory(parsed.category),
           issuer: parsed.issuer ?? "",
           doc_date: new Date().toISOString().slice(0, 10),
           extracted_text: parsed.body,
@@ -701,6 +711,7 @@ export function UploadStudio() {
           )}
         </AnimatePresence>
 
+        <MyDocuments limit={6} />
         <CorrectionHistory compact />
       </div>
 
