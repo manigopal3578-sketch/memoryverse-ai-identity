@@ -4,6 +4,7 @@ import { ArrowLeft, Sparkles, Upload, Search, Clock, Network, User, Share2, Home
 import { BackgroundFX } from "./BackgroundFX";
 import { GlassDock } from "./GlassDock";
 import { toast } from "sonner";
+import { AuthButton } from "./AuthButton";
 import type { ReactNode } from "react";
 
 const nav = [
