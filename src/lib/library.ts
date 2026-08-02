@@ -82,7 +82,7 @@ export interface NewDocument {
 export async function createDocument(userId: string, doc: NewDocument): Promise<DocRecord> {
   const { data, error } = await supabase
     .from("documents")
-    .insert({ ...doc, user_id: userId })
+    .insert({ ...doc, user_id: userId } as never)
     .select("*")
     .single();
   if (error) throw error;
@@ -90,7 +90,7 @@ export async function createDocument(userId: string, doc: NewDocument): Promise<
 }
 
 export async function updateDocument(id: string, patch: Partial<NewDocument>): Promise<void> {
-  const { error } = await supabase.from("documents").update(patch).eq("id", id);
+  const { error } = await supabase.from("documents").update(patch as never).eq("id", id);
   if (error) throw error;
 }
 
@@ -187,6 +187,6 @@ export async function updateProfile(
   userId: string,
   patch: Record<string, unknown>,
 ): Promise<void> {
-  const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
+  const { error } = await supabase.from("profiles").update(patch as never).eq("id", userId);
   if (error) throw error;
 }
