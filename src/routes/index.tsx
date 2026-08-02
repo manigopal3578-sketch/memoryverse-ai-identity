@@ -113,7 +113,8 @@ function Nav() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link to="/upload" className="hidden md:block">
+          <AuthButton />
+          <Link to="/upload" className="hidden lg:block">
             <CornerButton className="!py-2 !px-4 text-xs">
               Get early access <ArrowRight size={14} />
             </CornerButton>
