@@ -29,6 +29,10 @@ import { smartName, smartNameFromUrl, type SmartCategory } from "@/lib/smart-nam
 import { toast } from "sonner";
 import { logCorrection } from "@/lib/mv-store";
 import { CorrectionHistory } from "./CorrectionHistory";
+import { MyDocuments } from "./MyDocuments";
+import { useAuth } from "@/lib/auth";
+import { useLibrary } from "@/lib/useLibrary";
+import { createDocument, saveCorrection, uploadDocumentFile } from "@/lib/library";
 
 const DocumentViewer = lazy(() =>
   import("./DocumentViewer").then((m) => ({ default: m.DocumentViewer })),
