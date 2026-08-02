@@ -77,12 +77,15 @@ export function AppShell({
               </Link>
             ))}
           </nav>
-          <Link
-            to="/"
-            className="glass inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition hover:scale-[1.02]"
-          >
-            <ArrowLeft size={12} /> Home
-          </Link>
+          <div className="flex items-center gap-1.5">
+            <AuthButton />
+            <Link
+              to="/"
+              className="glass hidden items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition hover:scale-[1.02] sm:inline-flex"
+            >
+              <ArrowLeft size={12} /> Home
+            </Link>
+          </div>
         </div>
       </header>
 
