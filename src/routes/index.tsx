@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { AuthButton } from "@/components/mv/AuthButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import {
