@@ -29,6 +29,10 @@ import { smartName, smartNameFromUrl, type SmartCategory } from "@/lib/smart-nam
 import { toast } from "sonner";
 import { logCorrection } from "@/lib/mv-store";
 import { CorrectionHistory } from "./CorrectionHistory";
+import { MyDocuments } from "./MyDocuments";
+import { useAuth } from "@/lib/auth";
+import { useLibrary } from "@/lib/useLibrary";
+import { createDocument, saveCorrection, uploadDocumentFile } from "@/lib/library";
 
 const DocumentViewer = lazy(() =>
   import("./DocumentViewer").then((m) => ({ default: m.DocumentViewer })),
@@ -154,6 +158,74 @@ export function UploadStudio() {
   const [editing, setEditing] = useState<string | null>(null);
   const timers = useRef<Record<string, ReturnType<typeof setInterval>>>({});
   const inputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
+  const dbCategory = (c: SmartCategory) =>
+    ({
+      Certificate: "Certificates",
+      Resume: "Resumes",
+      Internship: "Internships",
+      Project: "Projects",
+      Transcript: "Academics",
+      Portfolio: "Projects",
+      Event: "Events",
+    })[c] ?? "Certificates";
+  const { upsertLocal } = useLibrary();
+
+  /** Persists a picked file (and its AI-extracted metadata) to the signed-in student's vault. */
+  const persistFile = useCallback(
+    async (raw: File, parsed: ParsedFile) => {
+      if (!user) return;
+      try {
+        const path = await uploadDocumentFile(user.id, raw);
+        const saved = await createDocument(user.id, {
+          title: parsed.displayName,
+          category: dbCategory(parsed.category),
+          issuer: parsed.issuer ?? "",
+          doc_date: new Date().toISOString().slice(0, 10),
+          extracted_text: parsed.body,
+          snippet: parsed.body.slice(0, 160),
+          tags: [parsed.category],
+          skills: [],
+          fields: parsed.fields.map((f) => ({ label: f.label, value: f.value })),
+          confidence: 0.94,
+          file_path: path,
+          file_name: raw.name,
+          file_type: raw.type || "application/octet-stream",
+          file_size: raw.size,
+        });
+        upsertLocal(saved);
+        toast.success("Saved to your vault", { description: saved.title });
+      } catch {
+        toast.error("Could not save that file to your vault");
+      }
+    },
+    [user, upsertLocal],
+  );
+
+  const persistUrlItem = useCallback(
+    async (parsed: ParsedFile) => {
+      if (!user) return;
+      try {
+        const saved = await createDocument(user.id, {
+          title: parsed.displayName,
+          category: dbCategory(parsed.category),
+          issuer: parsed.issuer ?? "",
+          doc_date: new Date().toISOString().slice(0, 10),
+          extracted_text: parsed.body,
+          snippet: parsed.url ?? "",
+          tags: ["Imported link"],
+          fields: parsed.fields.map((f) => ({ label: f.label, value: f.value })),
+          confidence: 0.9,
+        });
+        upsertLocal(saved);
+        toast.success("Link saved to your vault", { description: saved.title });
+      } catch {
+        toast.error("Could not save that link");
+      }
+    },
+    [user, upsertLocal],
+  );
+
 
   const advance = useCallback((id: string) => {
     timers.current[id] = setInterval(() => {
@@ -204,8 +276,12 @@ export function UploadStudio() {
       if (additions[0]) setSelected(additions[0].id);
       additions.forEach((a) => advance(a.id));
       if (additions[0]) toast.success("Named smartly", { description: additions[0].displayName });
+      list.slice(0, 4).forEach((raw, i) => {
+        const parsed = additions[i];
+        if (parsed) void persistFile(raw, parsed);
+      });
     },
-    [advance],
+    [advance, persistFile],
   );
 
   const addUrl = useCallback(() => {
@@ -240,7 +316,8 @@ export function UploadStudio() {
     setUrlInput("");
     advance(item.id);
     toast.success("Link imported", { description: sn.title });
-  }, [urlInput, advance]);
+    void persistUrlItem(item);
+  }, [urlInput, advance, persistUrlItem]);
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
@@ -266,6 +343,7 @@ export function UploadStudio() {
     const item = files.find((f) => f.id === fileId);
     const val = item?.fields.find((fd) => fd.label === label)?.value ?? "";
     logCorrection({ itemId: fileId, itemName: item?.displayName ?? fileId, field: label, kind: feedback, before: val, after: val });
+    if (user) void saveCorrection(user.id, { item_title: item?.displayName ?? fileId, field_label: label, kind: feedback, before_text: val, after_text: val }).catch(() => {});
     toast.success("Thanks — AI learning", {
       description: `Timeline, graph & search updated for ${label}.`,
     });
@@ -276,6 +354,7 @@ export function UploadStudio() {
     const before = item?.fields.find((fd) => fd.label === label)?.value ?? "";
     if (before !== value) {
       logCorrection({ itemId: fileId, itemName: item?.displayName ?? fileId, field: label, kind: "edit", before, after: value });
+      if (user) void saveCorrection(user.id, { item_title: item?.displayName ?? fileId, field_label: label, kind: "edit", before_text: before, after_text: value }).catch(() => {});
       toast.success("Correction saved", { description: `${label} updated — timeline, graph & search refreshed.` });
     }
     setFiles((prev) =>
@@ -632,6 +711,7 @@ export function UploadStudio() {
           )}
         </AnimatePresence>
 
+        <MyDocuments limit={6} />
         <CorrectionHistory compact />
       </div>
 

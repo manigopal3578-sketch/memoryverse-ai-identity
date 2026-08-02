@@ -5,7 +5,13 @@ import { CorrectionHistory } from "@/components/mv/CorrectionHistory";
 import { motion, AnimatePresence } from "framer-motion";
 import { Award, Briefcase, Code2, Download, Edit3, FileText, GraduationCap, Share2, ExternalLink, X, Copy, Check, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth, profileCompleteness } from "@/lib/auth";
+import { useLibrary } from "@/lib/useLibrary";
+import { updateProfile } from "@/lib/library";
+import { AvatarPicker } from "@/components/mv/AvatarPicker";
+import { MyDocuments } from "@/components/mv/MyDocuments";
+import { SignedOutNotice } from "@/components/mv/AuthButton";
 
 
 export const Route = createFileRoute("/profile")({
@@ -124,9 +130,37 @@ async function generateResumePDF(name: string, tag: string) {
 }
 
 function ProfilePage() {
+  const { user, profile, refreshProfile } = useAuth();
+  const { docs } = useLibrary();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(identity.name);
   const [tag, setTag] = useState(identity.tag);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (profile) {
+      setName(profile.full_name || profile.email.split("@")[0] || identity.name);
+      setTag(profile.headline || identity.tag);
+    }
+  }, [profile?.id, profile?.full_name, profile?.headline]);
+
+  const completeness = profileCompleteness(profile, docs.length);
+
+  const toggleEdit = async () => {
+    if (editing && user) {
+      setSaving(true);
+      try {
+        await updateProfile(user.id, { full_name: name, headline: tag });
+        await refreshProfile();
+        toast.success("Profile saved");
+      } catch {
+        toast.error("Could not save your profile");
+      } finally {
+        setSaving(false);
+      }
+    }
+    setEditing((v) => !v);
+  };
   const [shareOpen, setShareOpen] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -162,12 +196,16 @@ function ProfilePage() {
       <div className="mx-auto max-w-6xl px-6 pb-16">
         <div className="glass relative overflow-hidden rounded-3xl p-8">
           <div className="flex flex-wrap items-start gap-6">
-            <div
-              className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl font-display text-3xl text-white shadow-[var(--shadow-glow)]"
-              style={{ background: "var(--gradient-hero)" }}
-            >
-              {name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
-            </div>
+            {user ? (
+              <AvatarPicker />
+            ) : (
+              <div
+                className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl font-display text-3xl text-white shadow-[var(--shadow-glow)]"
+                style={{ background: "var(--gradient-hero)" }}
+              >
+                {name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               {editing ? (
                 <div className="space-y-2">
@@ -187,8 +225,12 @@ function ProfilePage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button onClick={() => setEditing((v) => !v)} className="glass inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold">
-                <Edit3 size={12} /> {editing ? "Save" : "Edit"}
+              <button
+                onClick={() => void toggleEdit()}
+                disabled={saving}
+                className="glass inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold disabled:opacity-60"
+              >
+                <Edit3 size={12} /> {editing ? (saving ? "Saving…" : "Save") : "Edit"}
               </button>
               <button onClick={() => setShareOpen(true)} className="glass inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold">
                 <Share2 size={12} /> Share
@@ -204,7 +246,36 @@ function ProfilePage() {
           />
         </div>
 
+        {!user && (
+          <div className="mt-6">
+            <SignedOutNotice what="save your profile, photo and documents permanently" />
+          </div>
+        )}
+
         <div className="mt-6 grid gap-6 md:grid-cols-3">
+          <div className="glass rounded-2xl p-6">
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Profile completeness
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="font-display text-5xl text-gradient">{user ? completeness : 0}</span>
+              <span className="text-xs text-muted-foreground">%</span>
+            </div>
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-black/5">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${user ? completeness : 0}%` }}
+                transition={{ duration: 1 }}
+                className="h-full"
+                style={{ background: "var(--gradient-hero)" }}
+              />
+            </div>
+            <p className="mt-3 text-[11px] text-muted-foreground">
+              {user
+                ? `${docs.length} document${docs.length === 1 ? "" : "s"} stored · photo, headline, skills and education all count.`
+                : "Sign in with Google to start building your persistent identity."}
+            </p>
+          </div>
           <div className="glass rounded-2xl p-6">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Identity score</div>
             <div className="mt-2 flex items-baseline gap-2">
@@ -243,26 +314,8 @@ function ProfilePage() {
           <Section title="Awards & Certificates" icon={Award} tint="var(--amber)" items={identity.awards} />
         </div>
 
-        <div className="mt-8 glass rounded-2xl p-6">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Recent documents</div>
-            <Link to="/search" className="text-[11px] font-semibold text-primary">See all →</Link>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              "Google_Internship_Letter.pdf",
-              "Stanford_ML_Cert.pdf",
-              "Capstone_Report_v2.pdf",
-              "Hackathon_Winner_Cert.png",
-              "Resume_v3.pdf",
-              "Transcript_Sem6.pdf",
-            ].map((d) => (
-              <div key={d} className="flex items-center gap-3 rounded-xl bg-white/60 p-3 text-xs">
-                <FileText size={14} className="text-primary" />
-                <span className="truncate">{d}</span>
-              </div>
-            ))}
-          </div>
+        <div className="mt-8">
+          <MyDocuments />
         </div>
 
         <div className="mt-8">

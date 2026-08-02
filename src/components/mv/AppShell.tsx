@@ -4,6 +4,7 @@ import { ArrowLeft, Sparkles, Upload, Search, Clock, Network, User, Share2, Home
 import { BackgroundFX } from "./BackgroundFX";
 import { GlassDock } from "./GlassDock";
 import { toast } from "sonner";
+import { AuthButton } from "./AuthButton";
 import type { ReactNode } from "react";
 
 const nav = [
@@ -77,12 +78,15 @@ export function AppShell({
               </Link>
             ))}
           </nav>
-          <Link
-            to="/"
-            className="glass inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition hover:scale-[1.02]"
-          >
-            <ArrowLeft size={12} /> Home
-          </Link>
+          <div className="flex items-center gap-1.5">
+            <AuthButton />
+            <Link
+              to="/"
+              className="glass hidden items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition hover:scale-[1.02] sm:inline-flex"
+            >
+              <ArrowLeft size={12} /> Home
+            </Link>
+          </div>
         </div>
       </header>
 
