@@ -158,6 +158,64 @@ export function UploadStudio() {
   const [editing, setEditing] = useState<string | null>(null);
   const timers = useRef<Record<string, ReturnType<typeof setInterval>>>({});
   const inputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
+  const { upsertLocal } = useLibrary();
+
+  /** Persists a picked file (and its AI-extracted metadata) to the signed-in student's vault. */
+  const persistFile = useCallback(
+    async (raw: File, parsed: ParsedFile) => {
+      if (!user) return;
+      try {
+        const path = await uploadDocumentFile(user.id, raw);
+        const saved = await createDocument(user.id, {
+          title: parsed.displayName,
+          category: parsed.category === "Resume" ? "Resumes" : `${parsed.category}s`.replace("ss", "s"),
+          issuer: parsed.issuer ?? "",
+          doc_date: new Date().toISOString().slice(0, 10),
+          extracted_text: parsed.body,
+          snippet: parsed.body.slice(0, 160),
+          tags: [parsed.category],
+          skills: [],
+          fields: parsed.fields.map((f) => ({ label: f.label, value: f.value })),
+          confidence: 0.94,
+          file_path: path,
+          file_name: raw.name,
+          file_type: raw.type || "application/octet-stream",
+          file_size: raw.size,
+        });
+        upsertLocal(saved);
+        toast.success("Saved to your vault", { description: saved.title });
+      } catch {
+        toast.error("Could not save that file to your vault");
+      }
+    },
+    [user, upsertLocal],
+  );
+
+  const persistUrlItem = useCallback(
+    async (parsed: ParsedFile) => {
+      if (!user) return;
+      try {
+        const saved = await createDocument(user.id, {
+          title: parsed.displayName,
+          category: parsed.category === "Resume" ? "Resumes" : `${parsed.category}s`.replace("ss", "s"),
+          issuer: parsed.issuer ?? "",
+          doc_date: new Date().toISOString().slice(0, 10),
+          extracted_text: parsed.body,
+          snippet: parsed.url ?? "",
+          tags: ["Imported link"],
+          fields: parsed.fields.map((f) => ({ label: f.label, value: f.value })),
+          confidence: 0.9,
+        });
+        upsertLocal(saved);
+        toast.success("Link saved to your vault", { description: saved.title });
+      } catch {
+        toast.error("Could not save that link");
+      }
+    },
+    [user, upsertLocal],
+  );
+
 
   const advance = useCallback((id: string) => {
     timers.current[id] = setInterval(() => {
