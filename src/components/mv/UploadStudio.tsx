@@ -266,8 +266,12 @@ export function UploadStudio() {
       if (additions[0]) setSelected(additions[0].id);
       additions.forEach((a) => advance(a.id));
       if (additions[0]) toast.success("Named smartly", { description: additions[0].displayName });
+      list.slice(0, 4).forEach((raw, i) => {
+        const parsed = additions[i];
+        if (parsed) void persistFile(raw, parsed);
+      });
     },
-    [advance],
+    [advance, persistFile],
   );
 
   const addUrl = useCallback(() => {
@@ -302,7 +306,8 @@ export function UploadStudio() {
     setUrlInput("");
     advance(item.id);
     toast.success("Link imported", { description: sn.title });
-  }, [urlInput, advance]);
+    void persistUrlItem(item);
+  }, [urlInput, advance, persistUrlItem]);
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
@@ -328,6 +333,7 @@ export function UploadStudio() {
     const item = files.find((f) => f.id === fileId);
     const val = item?.fields.find((fd) => fd.label === label)?.value ?? "";
     logCorrection({ itemId: fileId, itemName: item?.displayName ?? fileId, field: label, kind: feedback, before: val, after: val });
+    if (user) void saveCorrection(user.id, { item_title: item?.displayName ?? fileId, field_label: label, kind: feedback, before_text: val, after_text: val }).catch(() => {});
     toast.success("Thanks — AI learning", {
       description: `Timeline, graph & search updated for ${label}.`,
     });
@@ -338,6 +344,7 @@ export function UploadStudio() {
     const before = item?.fields.find((fd) => fd.label === label)?.value ?? "";
     if (before !== value) {
       logCorrection({ itemId: fileId, itemName: item?.displayName ?? fileId, field: label, kind: "edit", before, after: value });
+      if (user) void saveCorrection(user.id, { item_title: item?.displayName ?? fileId, field_label: label, kind: "edit", before_text: before, after_text: value }).catch(() => {});
       toast.success("Correction saved", { description: `${label} updated — timeline, graph & search refreshed.` });
     }
     setFiles((prev) =>
