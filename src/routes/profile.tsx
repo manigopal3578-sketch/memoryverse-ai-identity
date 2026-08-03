@@ -455,22 +455,22 @@ function ProfilePage() {
               <div className="text-[10px] font-semibold uppercase tracking-widest text-primary">Resume · AI-polished · v3</div>
               <h3 className="mt-1 font-display text-3xl">{name}</h3>
               <p className="text-xs text-muted-foreground">{tag}</p>
-              <p className="mt-4 text-sm leading-relaxed">{identity.story}</p>
+              <p className="mt-4 text-sm leading-relaxed">{story}</p>
 
               <ResumeBlock title="Skills">
-                <p className="text-xs text-muted-foreground">{identity.skills.join("  ·  ")}</p>
+                <p className="text-xs text-muted-foreground">{skills.join("  ·  ") || "—"}</p>
               </ResumeBlock>
               <ResumeBlock title="Education">
-                {identity.education.map((e) => <MiniRow key={e.primary} {...e} />)}
+                {education.map((e) => <MiniRow key={e.primary} {...e} />)}
               </ResumeBlock>
               <ResumeBlock title="Experience">
-                {identity.internships.map((e) => <MiniRow key={e.primary} {...e} />)}
+                {internships.map((e) => <MiniRow key={e.primary} {...e} />)}
               </ResumeBlock>
               <ResumeBlock title="Projects">
-                {identity.projects.map((e) => <MiniRow key={e.primary} {...e} />)}
+                {projects.map((e) => <MiniRow key={e.primary} {...e} />)}
               </ResumeBlock>
               <ResumeBlock title="Awards">
-                {identity.awards.map((e) => <MiniRow key={e.primary} {...e} />)}
+                {awards.map((e) => <MiniRow key={e.primary} {...e} />)}
               </ResumeBlock>
 
               <div className="mt-6 flex justify-end gap-2">
