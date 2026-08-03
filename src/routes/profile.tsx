@@ -391,13 +391,27 @@ function ProfilePage() {
               <div className="mt-5 overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm">
                 <div className="relative h-28" style={{ background: "var(--gradient-hero)" }}>
                   <div className="absolute inset-0 flex items-center justify-center text-white">
-                    <Sparkles size={24} />
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt={`${name} profile photo`} className="h-16 w-16 rounded-2xl object-cover ring-2 ring-white/70" />
+                    ) : (
+                      <Sparkles size={24} />
+                    )}
                   </div>
                 </div>
                 <div className="p-4">
                   <div className="text-[10px] uppercase tracking-widest text-muted-foreground">memoryverse.ai</div>
                   <div className="mt-1 text-sm font-semibold">{name} · Digital Identity</div>
                   <div className="text-[11px] text-muted-foreground">{tag}</div>
+                  {!isGuest && (
+                    <div className="mt-2 flex flex-wrap gap-1.5 text-[10px]">
+                      {skills.slice(0, 4).map((s) => (
+                        <span key={s} className="rounded-full bg-black/5 px-2 py-0.5 font-semibold text-primary">{s}</span>
+                      ))}
+                      <span className="rounded-full bg-black/5 px-2 py-0.5 font-semibold text-muted-foreground">
+                        {docs.length} document{docs.length === 1 ? "" : "s"} · {completeness}% complete
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
