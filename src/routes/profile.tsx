@@ -145,6 +145,25 @@ function ProfilePage() {
   }, [profile?.id, profile?.full_name, profile?.headline]);
 
   const completeness = profileCompleteness(profile, docs.length);
+  const isGuest = !user;
+
+  // Demo/reference content is guest-only; signed-in students see their own data.
+  const skills = isGuest ? identity.skills : (profile?.skills ?? []);
+  const byCategory = (match: RegExp) =>
+    docs
+      .filter((d) => match.test(d.category))
+      .map((d) => ({
+        primary: d.title,
+        secondary: [d.issuer, d.doc_date].filter(Boolean).join(" · ") || d.category,
+      }));
+  const education = isGuest ? identity.education : (profile?.education ?? []);
+  const internships = isGuest ? identity.internships : byCategory(/intern|experience|work/i);
+  const projects = isGuest ? identity.projects : byCategory(/project/i);
+  const awards = isGuest ? identity.awards : byCategory(/certificate|award|achievement/i);
+  const story = isGuest
+    ? identity.story
+    : profile?.bio ||
+      `${name} is building a verified digital identity — ${docs.length} document${docs.length === 1 ? "" : "s"} stored and growing.`;
 
   const toggleEdit = async () => {
     if (editing && user) {
@@ -165,7 +184,9 @@ function ProfilePage() {
   const [resumeOpen, setResumeOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/profile?u=ananya-rao` : "/profile";
+  const slug = (name || "student").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const shareUrl =
+    typeof window !== "undefined" ? `${window.location.origin}/profile?u=${slug}` : `/profile?u=${slug}`;
 
   const copyShare = async () => {
     try {
