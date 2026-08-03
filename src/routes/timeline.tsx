@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Award, Briefcase, Code2, GraduationCap, X, FileText, Sparkles, Tag, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
+import { useLibrary } from "@/lib/useLibrary";
+import type { DocRecord } from "@/lib/library";
 
 export const Route = createFileRoute("/timeline")({
   validateSearch: (s: Record<string, unknown>): { skill?: string; event?: string } => ({
@@ -36,7 +39,7 @@ interface Event {
   skills: string[];
 }
 
-const events: Event[] = [
+const demoEvents: Event[] = [
   {
     year: 2022, semester: 1, date: "Aug 2022", title: "Started B.Tech CSE",
     desc: "Joined engineering with a curious heart and a broken laptop.",
@@ -111,13 +114,60 @@ const events: Event[] = [
   },
 ];
 
+const catFor = (category: string): Exclude<Cat, "All"> => {
+  if (/project/i.test(category)) return "Projects";
+  if (/intern|experience/i.test(category)) return "Internships";
+  if (/certificate|award|event/i.test(category)) return "Awards";
+  return "Academic";
+};
+const visualFor: Record<Exclude<Cat, "All">, { icon: typeof Award; tint: string }> = {
+  Academic: { icon: GraduationCap, tint: "var(--violet)" },
+  Projects: { icon: Code2, tint: "var(--mint)" },
+  Internships: { icon: Briefcase, tint: "var(--ice)" },
+  Awards: { icon: Award, tint: "var(--amber)" },
+};
+
+/** Build a real timeline out of the signed-in student's own saved documents. */
+function eventsFromDocs(docs: DocRecord[]): Event[] {
+  return docs
+    .map((d) => {
+      const raw = d.doc_date || d.created_at;
+      const parsed = new Date(raw);
+      const valid = !Number.isNaN(parsed.getTime());
+      const year = valid ? parsed.getFullYear() : new Date(d.created_at).getFullYear();
+      const month = valid ? parsed.getMonth() : 0;
+      const category = catFor(d.category);
+      const visual = visualFor[category];
+      return {
+        year,
+        semester: (month > 5 ? 2 : 1) as 1 | 2,
+        date: valid
+          ? parsed.toLocaleDateString(undefined, { month: "short", year: "numeric" })
+          : String(year),
+        title: d.title,
+        desc: d.snippet || `${d.category}${d.issuer ? ` · ${d.issuer}` : ""}`,
+        category,
+        icon: visual.icon,
+        tint: visual.tint,
+        documents: [{ name: d.file_name ?? `${d.title}`, type: d.category }],
+        highlights: d.fields.slice(0, 3).map((f) => `${f.label}: ${f.value}`),
+        skills: d.skills,
+      } satisfies Event;
+    })
+    .sort((a, b) => a.year - b.year);
+}
+
 function TimelinePage() {
+  const { user } = useAuth();
+  const { docs } = useLibrary();
+  const events = useMemo(() => (user ? eventsFromDocs(docs) : demoEvents), [user, docs]);
   const { skill, event: eventParam } = Route.useSearch();
   const [cat, setCat] = useState<Cat>("All");
   const [year, setYear] = useState<number | "All">("All");
   const [open, setOpen] = useState<Event | null>(null);
 
   const years = Array.from(new Set(events.map((e) => e.year))).sort();
+  const isEmpty = events.length === 0;
   const cats: Cat[] = ["All", "Academic", "Projects", "Internships", "Awards"];
 
   const filtered = useMemo(
@@ -128,7 +178,7 @@ function TimelinePage() {
           (year === "All" || e.year === year) &&
           (!skill || e.skills.some((s) => s.toLowerCase().includes(skill.toLowerCase()))),
       ),
-    [cat, year, skill],
+    [cat, year, skill, events],
   );
 
   useEffect(() => {
@@ -136,7 +186,7 @@ function TimelinePage() {
       const found = events.find((e) => e.title === eventParam);
       if (found) setOpen(found);
     }
-  }, [eventParam]);
+  }, [eventParam, events]);
 
   return (
     <AppShell
@@ -193,6 +243,12 @@ function TimelinePage() {
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-semibold text-primary">
             Filtered by skill · {skill}
             <Link to="/timeline" search={{}} className="rounded-full bg-white/70 px-2 py-0.5 text-foreground">Clear</Link>
+          </div>
+        )}
+
+        {isEmpty && (
+          <div className="glass mt-8 rounded-2xl p-8 text-center text-sm text-muted-foreground">
+            Your timeline builds itself from your uploads — add your first document to see it appear here.
           </div>
         )}
 

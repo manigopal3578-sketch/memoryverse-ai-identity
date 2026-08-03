@@ -6,6 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { vaultItems, type VaultCategory, type VaultItem } from "@/lib/vault-data";
 import { ItemDetailModal } from "@/components/mv/ItemDetailModal";
+import { DocumentPreviewModal } from "@/components/mv/DocumentPreviewModal";
+import { useAuth } from "@/lib/auth";
+import { useLibrary } from "@/lib/useLibrary";
+import { docToVaultItem } from "@/lib/doc-vault";
 
 export const Route = createFileRoute("/search")({
   head: () => ({
@@ -40,11 +44,17 @@ function SearchPage() {
   const [cursor, setCursor] = useState(0);
   const [open, setOpen] = useState<VaultItem | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const { docs, removeLocal, upsertLocal } = useLibrary();
+
+  // Signed-in students only ever see their own persisted vault; demo items are guest-only.
+  const source = useMemo(() => (user ? docs.map(docToVaultItem) : vaultItems), [user, docs]);
+  const openDoc = user && open ? docs.find((d) => d.id === open.id) ?? null : null;
 
   const results = useMemo(() => {
     const query = q.toLowerCase().trim();
     const tokens = query.split(/\s+/).filter(Boolean);
-    const filtered = vaultItems.filter((it) => {
+    const filtered = source.filter((it) => {
       const inCat = cat === "All" || it.category === cat;
       if (!inCat) return false;
       if (tokens.length === 0) return true;
@@ -62,7 +72,7 @@ function SearchPage() {
       return b.it.confidence - a.it.confidence;
     });
     return scored.map((s) => s.it);
-  }, [q, cat, sort]);
+  }, [q, cat, sort, source]);
 
   const pages = Math.max(1, Math.ceil(results.length / PER_PAGE));
   const clampedPage = Math.min(page, pages - 1);
@@ -166,6 +176,9 @@ function SearchPage() {
           <span>
             {results.length} result{results.length === 1 ? "" : "s"} · page {clampedPage + 1} of {pages}
           </span>
+          {!user && (
+            <span className="rounded-full bg-white/60 px-2 py-0.5 font-semibold">Demo vault · sign in to search your own</span>
+          )}
           <span className="inline-flex items-center gap-1 rounded-full bg-white/60 px-2 py-0.5">
             ↑ ↓ to move · <CornerDownLeft size={10} /> to open · ← → to page
           </span>
@@ -246,7 +259,9 @@ function SearchPage() {
           </AnimatePresence>
           {results.length === 0 && (
             <div className="glass rounded-2xl p-10 text-center text-sm text-muted-foreground">
-              No memories match. Try a broader phrase.
+              {user && docs.length === 0
+                ? "Your vault is empty — upload a certificate, resume or project to search it here."
+                : "No memories match. Try a broader phrase."}
             </div>
           )}
         </div>
@@ -288,7 +303,16 @@ function SearchPage() {
       </div>
 
       <AnimatePresence>
-        {open && <ItemDetailModal item={open} query={q} onClose={() => setOpen(null)} />}
+        {open && openDoc && (
+          <DocumentPreviewModal
+            doc={openDoc}
+            query={q}
+            onClose={() => setOpen(null)}
+            onDeleted={(id) => { removeLocal(id); setOpen(null); }}
+            onUpdated={(d) => { upsertLocal(d); setOpen(docToVaultItem(d)); }}
+          />
+        )}
+        {open && !openDoc && <ItemDetailModal item={open} query={q} onClose={() => setOpen(null)} />}
       </AnimatePresence>
     </AppShell>
   );

@@ -181,6 +181,69 @@ export type Database = {
         }
         Relationships: []
       }
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          awards: Json
+          bio: string
+          completeness: number
+          created_at: string
+          doc_count: number
+          education: Json
+          full_name: string
+          headline: string
+          is_public: boolean
+          location: string
+          projects: Json
+          skills: Json
+          slug: string
+          timeline: Json
+          updated_at: string
+          user_id: string
+          visible_sections: Json
+        }
+        Insert: {
+          avatar_url?: string | null
+          awards?: Json
+          bio?: string
+          completeness?: number
+          created_at?: string
+          doc_count?: number
+          education?: Json
+          full_name?: string
+          headline?: string
+          is_public?: boolean
+          location?: string
+          projects?: Json
+          skills?: Json
+          slug: string
+          timeline?: Json
+          updated_at?: string
+          user_id: string
+          visible_sections?: Json
+        }
+        Update: {
+          avatar_url?: string | null
+          awards?: Json
+          bio?: string
+          completeness?: number
+          created_at?: string
+          doc_count?: number
+          education?: Json
+          full_name?: string
+          headline?: string
+          is_public?: boolean
+          location?: string
+          projects?: Json
+          skills?: Json
+          slug?: string
+          timeline?: Json
+          updated_at?: string
+          user_id?: string
+          visible_sections?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

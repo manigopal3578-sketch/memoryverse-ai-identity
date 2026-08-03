@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Award, Briefcase, Code2, GraduationCap, Sparkles, FileText, ZoomIn, ZoomOut, RotateCcw, Filter, X, Link2, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
+import { useLibrary } from "@/lib/useLibrary";
+import type { DocRecord } from "@/lib/library";
 
 export const Route = createFileRoute("/graph")({
   validateSearch: (s: Record<string, unknown>): { skill?: string; node?: string } => ({
@@ -37,7 +40,7 @@ interface N {
   story: string;
 }
 
-const allNodes: N[] = [
+const demoNodes: N[] = [
   { id: "cert1", label: "Stanford ML", kind: "cert", x: 15, y: 20, icon: Award, tint: "var(--amber)", detail: "Coursera · 2024", documents: ["Stanford_ML_Cert.pdf", "Final_Project_Emotion.pdf"], skills: ["Python", "PyTorch", "ML Theory"], story: "A grade-A specialization that unlocked your fluency in ML fundamentals and led directly to your capstone." },
   { id: "cert2", label: "AWS Cloud", kind: "cert", x: 12, y: 55, icon: Award, tint: "var(--amber)", detail: "Amazon · 2023", documents: ["AWS_Cert.pdf"], skills: ["AWS", "Cloud", "Security"], story: "Your first cloud credential — the foundation for every deployed project since." },
   { id: "skill1", label: "React", kind: "skill", x: 38, y: 15, icon: Code2, tint: "var(--mint)", detail: "12 projects · 3 years", documents: ["ChatApp_Report.pdf", "Portfolio_v4.pdf"], skills: ["JSX", "Hooks", "State"], story: "Extracted from 12 documents; your most consistently demonstrated skill across projects and internships." },
@@ -50,7 +53,7 @@ const allNodes: N[] = [
   { id: "ai", label: "You", kind: "ai", x: 50, y: 50, icon: Sparkles, tint: "var(--indigo)", detail: "AI-composed identity", documents: ["Resume_v3.pdf"], skills: ["Builder", "Curious", "Kind"], story: "The living, AI-composed identity that stitches every memory into one honest story." },
 ];
 
-const edges: [string, string][] = [
+const demoEdges: [string, string][] = [
   ["cert1", "skill2"], ["cert2", "skill1"], ["skill1", "proj1"], ["skill1", "proj2"],
   ["skill2", "proj1"], ["proj1", "intern1"], ["proj2", "intern2"], ["intern1", "ai"],
   ["intern2", "ai"], ["proj1", "ai"], ["deg", "ai"], ["cert1", "ai"],
@@ -64,7 +67,80 @@ const filters: { key: NodeKind | "all"; label: string }[] = [
   { key: "intern", label: "Internships" },
 ];
 
+const kindFor = (category: string): NodeKind => {
+  if (/project/i.test(category)) return "project";
+  if (/intern|experience/i.test(category)) return "intern";
+  if (/academic|resume/i.test(category)) return "degree";
+  return "cert";
+};
+const kindVisual: Record<NodeKind, { icon: typeof Award; tint: string }> = {
+  cert: { icon: Award, tint: "var(--amber)" },
+  skill: { icon: Code2, tint: "var(--mint)" },
+  project: { icon: FileText, tint: "var(--rose)" },
+  intern: { icon: Briefcase, tint: "var(--ice)" },
+  degree: { icon: GraduationCap, tint: "var(--violet)" },
+  ai: { icon: Sparkles, tint: "var(--indigo)" },
+};
+
+/** Build a personal knowledge graph from the signed-in student's documents. */
+function graphFromDocs(docs: DocRecord[], name: string): { nodes: N[]; edges: [string, string][] } {
+  const you: N = {
+    id: "ai", label: name || "You", kind: "ai", x: 50, y: 50,
+    icon: Sparkles, tint: "var(--indigo)", detail: "AI-composed identity",
+    documents: docs.slice(0, 4).map((d) => d.file_name ?? d.title),
+    skills: Array.from(new Set(docs.flatMap((d) => d.skills))).slice(0, 6),
+    story: `Your identity, stitched from ${docs.length} verified document${docs.length === 1 ? "" : "s"}.`,
+  };
+  if (docs.length === 0) return { nodes: [you], edges: [] };
+
+  const nodes: N[] = [you];
+  const edges: [string, string][] = [];
+  const skillIds = new Map<string, string>();
+
+  docs.slice(0, 14).forEach((d, i, arr) => {
+    const angle = (i / arr.length) * Math.PI * 2;
+    const kind = kindFor(d.category);
+    const visual = kindVisual[kind];
+    const id = `doc-${d.id}`;
+    nodes.push({
+      id, label: d.title.length > 22 ? `${d.title.slice(0, 21)}…` : d.title, kind,
+      x: 50 + Math.cos(angle) * 34, y: 50 + Math.sin(angle) * 34,
+      icon: visual.icon, tint: visual.tint,
+      detail: [d.issuer, d.doc_date].filter(Boolean).join(" · ") || d.category,
+      documents: [d.file_name ?? d.title], skills: d.skills,
+      story: d.snippet || d.extracted_text.slice(0, 180) || `${d.category} stored in your vault.`,
+    });
+    edges.push([id, "ai"]);
+
+    d.skills.slice(0, 3).forEach((sk, j) => {
+      let sid = skillIds.get(sk);
+      if (!sid) {
+        sid = `skill-${skillIds.size}`;
+        skillIds.set(sk, sid);
+        const a2 = angle + 0.18 * (j + 1);
+        nodes.push({
+          id: sid, label: sk, kind: "skill",
+          x: 50 + Math.cos(a2) * 17, y: 50 + Math.sin(a2) * 17,
+          icon: Code2, tint: "var(--mint)", detail: "Extracted skill",
+          documents: [], skills: [sk],
+          story: `Extracted by AI from your uploaded documents.`,
+        });
+        edges.push([sid, "ai"]);
+      }
+      edges.push([id, sid]);
+    });
+  });
+
+  return { nodes, edges };
+}
+
 function GraphPage() {
+  const { user, profile } = useAuth();
+  const { docs } = useLibrary();
+  const { nodes: allNodes, edges } = useMemo(
+    () => (user ? graphFromDocs(docs, profile?.full_name || "You") : { nodes: demoNodes, edges: demoEdges }),
+    [user, docs, profile?.full_name],
+  );
   const { skill, node } = Route.useSearch();
   const [zoom, setZoom] = useState(1);
   const [filter, setFilter] = useState<NodeKind | "all">("all");
@@ -81,7 +157,7 @@ function GraphPage() {
       );
       if (n) setSelected(n);
     }
-  }, [node, skill]);
+  }, [node, skill, allNodes]);
 
   const skillMatches = useMemo(() => {
     if (!skill) return new Set<string>();
@@ -90,11 +166,11 @@ function GraphPage() {
         .filter((n) => n.skills.some((s) => s.toLowerCase().includes(skill.toLowerCase())) || n.label.toLowerCase().includes(skill.toLowerCase()))
         .map((n) => n.id),
     );
-  }, [skill]);
+  }, [skill, allNodes]);
 
   const visibleIds = useMemo(
     () => new Set(allNodes.filter((n) => filter === "all" || n.kind === filter || n.kind === "ai").map((n) => n.id)),
-    [filter],
+    [filter, allNodes],
   );
   const nodeMap = Object.fromEntries(allNodes.map((n) => [n.id, n]));
 
@@ -106,10 +182,10 @@ function GraphPage() {
       if (b === selected.id) set.add(a);
     });
     return set;
-  }, [selected]);
+  }, [selected, edges]);
 
   const related = selected ? allNodes.filter((n) => relatedIds.has(n.id) && n.id !== selected.id) : [];
-  const completeness = Math.round((visibleIds.size / allNodes.length) * 100);
+  const completeness = allNodes.length ? Math.round((visibleIds.size / allNodes.length) * 100) : 0;
 
   return (
     <AppShell
