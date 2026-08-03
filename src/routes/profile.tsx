@@ -332,10 +332,23 @@ function ProfilePage() {
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <Section title="Education" icon={GraduationCap} tint="var(--violet)" items={identity.education} />
-          <Section title="Internships" icon={Briefcase} tint="var(--ice)" items={identity.internships} />
-          <Section title="Projects" icon={Code2} tint="var(--mint)" items={identity.projects} />
-          <Section title="Awards & Certificates" icon={Award} tint="var(--amber)" items={identity.awards} />
+          {isGuest && (
+            <div className="md:col-span-2 -mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Demo profile · sign in to see your own
+            </div>
+          )}
+          {(isGuest || education.length > 0) && (
+            <Section title="Education" icon={GraduationCap} tint="var(--violet)" items={education} />
+          )}
+          {(isGuest || internships.length > 0) && (
+            <Section title="Internships" icon={Briefcase} tint="var(--ice)" items={internships} />
+          )}
+          {(isGuest || projects.length > 0) && (
+            <Section title="Projects" icon={Code2} tint="var(--mint)" items={projects} />
+          )}
+          {(isGuest || awards.length > 0) && (
+            <Section title="Awards & Certificates" icon={Award} tint="var(--amber)" items={awards} />
+          )}
         </div>
 
         <div className="mt-8">
