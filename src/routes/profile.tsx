@@ -313,7 +313,7 @@ function ProfilePage() {
           </div>
           <div className="glass rounded-2xl p-6">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">AI Career Story</div>
-            <p className="mt-2 text-sm leading-relaxed">{identity.story}</p>
+            <p className="mt-2 text-sm leading-relaxed">{story}</p>
           </div>
           <div className="glass rounded-2xl p-6">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Quick actions</div>
