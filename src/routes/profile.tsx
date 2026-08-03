@@ -240,9 +240,12 @@ function ProfilePage() {
                 </>
               )}
               <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-                {identity.skills.map((s) => (
+                {skills.map((s) => (
                   <span key={s} className="glass rounded-full px-2.5 py-1 font-semibold text-primary">{s}</span>
                 ))}
+                {!isGuest && skills.length === 0 && (
+                  <span className="text-[11px] text-muted-foreground">No skills yet — upload documents to build them.</span>
+                )}
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
