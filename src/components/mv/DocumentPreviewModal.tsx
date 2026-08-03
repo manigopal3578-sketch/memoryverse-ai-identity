@@ -13,10 +13,12 @@ import {
   GraduationCap,
   Network,
   Sparkles,
+  Pencil,
+  Save,
   Trash2,
   X,
 } from "lucide-react";
-import { signedUrl, deleteDocument, type DocRecord } from "@/lib/library";
+import { signedUrl, deleteDocument, updateDocument, type DocRecord } from "@/lib/library";
 import { toast } from "sonner";
 
 const DocumentViewer = lazy(() =>
@@ -55,19 +57,29 @@ function buildHighlights(doc: DocRecord, query: string) {
 }
 
 export function DocumentPreviewModal({
-  doc,
+  doc: initialDoc,
   query = "",
   onClose,
   onDeleted,
+  onUpdated,
 }: {
   doc: DocRecord;
   query?: string;
   onClose: () => void;
   onDeleted?: (id: string) => void;
+  onUpdated?: (doc: DocRecord) => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [doc, setDoc] = useState<DocRecord>(initialDoc);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({
+    title: initialDoc.title,
+    issuer: initialDoc.issuer,
+    doc_date: initialDoc.doc_date,
+    category: initialDoc.category,
+  });
   const { icon: Icon, tint } = categoryVisual(doc.category);
 
   useEffect(() => {
@@ -93,6 +105,22 @@ export function DocumentPreviewModal({
   const isImage = (doc.file_type ?? "").startsWith("image/");
   const isPdf = (doc.file_type ?? "").includes("pdf");
 
+  const save = async () => {
+    setBusy(true);
+    try {
+      await updateDocument(doc.id, form);
+      const next = { ...doc, ...form };
+      setDoc(next);
+      onUpdated?.(next);
+      setEditing(false);
+      toast.success("Document updated");
+    } catch {
+      toast.error("Could not save your changes");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const remove = async () => {
     if (!window.confirm(`Delete “${doc.title}” from your vault?`)) return;
     setBusy(true);
@@ -113,7 +141,7 @@ export function DocumentPreviewModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-black/60 p-3 sm:items-center sm:p-6"
       onClick={onClose}
     >
       <motion.div
@@ -124,7 +152,7 @@ export function DocumentPreviewModal({
         role="dialog"
         aria-modal="true"
         aria-label={`${doc.category} preview: ${doc.title}`}
-        className="glass w-full max-w-3xl overflow-hidden rounded-3xl p-0"
+        className="glass my-auto max-h-[92dvh] w-full max-w-[min(48rem,100%)] overflow-hidden rounded-3xl p-0"
       >
         <div
           className="flex items-center justify-between gap-3 p-5 text-white"
@@ -136,7 +164,7 @@ export function DocumentPreviewModal({
             </span>
             <div className="min-w-0">
               <div className="text-[10px] uppercase tracking-widest opacity-80">{doc.category}</div>
-              <div className="truncate font-display text-2xl">{doc.title}</div>
+              <div className="truncate font-display text-xl sm:text-2xl">{doc.title}</div>
             </div>
           </div>
           <button
@@ -149,7 +177,7 @@ export function DocumentPreviewModal({
           </button>
         </div>
 
-        <div className="max-h-[72vh] space-y-4 overflow-y-auto p-5">
+        <div className="max-h-[calc(92dvh-92px)] space-y-4 overflow-y-auto overscroll-contain p-4 sm:p-5">
           <div className="flex flex-wrap gap-2 text-[11px]">
             {doc.issuer && (
               <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1">
@@ -266,7 +294,63 @@ export function DocumentPreviewModal({
             </div>
           )}
 
-          <div className="flex justify-end">
+          {editing && (
+            <div className="grid gap-2 rounded-2xl bg-white/70 p-3 sm:grid-cols-2">
+              {([
+                ["title", "Title"],
+                ["issuer", "Issuer"],
+                ["doc_date", "Date"],
+              ] as const).map(([key, label]) => (
+                <label key={key} className="min-w-0 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {label}
+                  <input
+                    value={form[key]}
+                    onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                    className="mt-1 w-full rounded-lg bg-white px-2.5 py-1.5 text-[12px] font-medium text-foreground outline-none ring-1 ring-black/5"
+                  />
+                </label>
+              ))}
+              <label className="min-w-0 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Category
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                  className="mt-1 w-full rounded-lg bg-white px-2.5 py-1.5 text-[12px] font-medium text-foreground outline-none ring-1 ring-black/5"
+                >
+                  {["Certificates", "Resumes", "Projects", "Internships", "Academics", "Events"].map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
+
+          <div className="flex flex-wrap justify-end gap-2">
+            {editing ? (
+              <>
+                <button
+                  onClick={() => { setEditing(false); setForm({ title: doc.title, issuer: doc.issuer, doc_date: doc.doc_date, category: doc.category }); }}
+                  className="rounded-xl bg-white/70 px-3 py-2 text-[11px] font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => void save()}
+                  disabled={busy}
+                  className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-semibold text-white disabled:opacity-50"
+                  style={{ background: "var(--gradient-hero)" }}
+                >
+                  <Save size={12} /> Save changes
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setEditing(true)}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-white/70 px-3 py-2 text-[11px] font-semibold hover:bg-white"
+              >
+                <Pencil size={12} /> Edit details
+              </button>
+            )}
             <button
               onClick={() => void remove()}
               disabled={busy}

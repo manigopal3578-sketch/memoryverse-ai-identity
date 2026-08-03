@@ -12,6 +12,15 @@ import { updateProfile } from "@/lib/library";
 import { AvatarPicker } from "@/components/mv/AvatarPicker";
 import { MyDocuments } from "@/components/mv/MyDocuments";
 import { SignedOutNotice } from "@/components/mv/AuthButton";
+import { QRCodeBox } from "@/components/mv/QRCodeBox";
+import {
+  DEFAULT_SECTIONS,
+  loadMyShare,
+  publishShare,
+  slugify,
+  unpublishShare,
+  type VisibleSections,
+} from "@/lib/share";
 
 
 export const Route = createFileRoute("/profile")({
@@ -53,7 +62,15 @@ const identity = {
     "Ananya is a builder — a rare mix of designer's eye and engineer's rigor. From her first hackathon win in 2022 to a Google summer internship in 2024, every artifact tells the same quiet story: someone who ships, learns, and elevates the people around her.",
 };
 
-async function generateResumePDF(name: string, tag: string) {
+interface ResumeData {
+  email: string; location: string; story: string; skills: string[];
+  education: { primary: string; secondary: string }[];
+  internships: { primary: string; secondary: string }[];
+  projects: { primary: string; secondary: string }[];
+  awards: { primary: string; secondary: string }[];
+}
+
+async function generateResumePDF(name: string, tag: string, data: ResumeData) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const margin = 48;
@@ -69,7 +86,7 @@ async function generateResumePDF(name: string, tag: string) {
   doc.setTextColor(90);
   doc.text(tag, margin, y);
   y += 14;
-  doc.text(`${identity.email}  ·  ${identity.location}`, margin, y);
+  doc.text([data.email, data.location].filter(Boolean).join("  ·  "), margin, y);
   y += 24;
 
   const section = (title: string) => {
@@ -100,27 +117,27 @@ async function generateResumePDF(name: string, tag: string) {
   section("Summary");
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10.5);
-  const wrapped = doc.splitTextToSize(identity.story, 595 - margin * 2);
+  const wrapped = doc.splitTextToSize(data.story, 595 - margin * 2);
   doc.text(wrapped, margin, y);
   y += wrapped.length * 13 + 8;
 
   section("Skills");
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10.5);
-  doc.text(identity.skills.join("  ·  "), margin, y);
+  doc.text(data.skills.join("  ·  ") || "—", margin, y);
   y += 22;
 
   section("Education");
-  identity.education.forEach((e) => item(e.primary, e.secondary));
+  data.education.forEach((e) => item(e.primary, e.secondary));
 
   section("Experience");
-  identity.internships.forEach((e) => item(e.primary, e.secondary));
+  data.internships.forEach((e) => item(e.primary, e.secondary));
 
   section("Projects");
-  identity.projects.forEach((e) => item(e.primary, e.secondary));
+  data.projects.forEach((e) => item(e.primary, e.secondary));
 
   section("Awards & Certificates");
-  identity.awards.forEach((e) => item(e.primary, e.secondary));
+  data.awards.forEach((e) => item(e.primary, e.secondary));
 
   doc.setFontSize(8);
   doc.setTextColor(160);
@@ -184,9 +201,96 @@ function ProfilePage() {
   const [resumeOpen, setResumeOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const slug = (name || "student").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const [sections, setSections] = useState<VisibleSections>(DEFAULT_SECTIONS);
+  const [published, setPublished] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [slug, setSlug] = useState(slugify(identity.name));
+
+  useEffect(() => {
+    setSlug(slugify(name || "student"));
+  }, [name]);
+
+  useEffect(() => {
+    if (!user) {
+      setPublished(false);
+      setSections(DEFAULT_SECTIONS);
+      return;
+    }
+    void loadMyShare(user.id).then((row) => {
+      if (!row) return;
+      setPublished(row.is_public);
+      setSections({ ...DEFAULT_SECTIONS, ...(row.visible_sections ?? {}) });
+      if (row.slug) setSlug(row.slug);
+    });
+  }, [user?.id]);
+
   const shareUrl =
-    typeof window !== "undefined" ? `${window.location.origin}/profile?u=${slug}` : `/profile?u=${slug}`;
+    typeof window !== "undefined" ? `${window.location.origin}/p/${slug}` : `/p/${slug}`;
+
+  const togglePublish = async () => {
+    if (!user) {
+      toast("Sign in to publish", { description: "Your public card is tied to your account." });
+      return;
+    }
+    setPublishing(true);
+    try {
+      if (published) {
+        await unpublishShare(user.id);
+        setPublished(false);
+        toast.success("Public profile unpublished");
+      } else {
+        await publishShare(user.id, {
+          slug,
+          full_name: name,
+          headline: tag,
+          bio: story,
+          location: profile?.location ?? "",
+          avatar_path: profile?.avatar_url ?? null,
+          skills,
+          education,
+          awards,
+          timeline: [...internships, ...projects],
+          projects,
+          visible_sections: sections,
+          doc_count: docs.length,
+          completeness,
+          is_public: true,
+        });
+        setPublished(true);
+        toast.success("Public profile published", { description: shareUrl });
+      }
+    } catch {
+      toast.error("Could not update your public profile");
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const savePublishedSections = async (next: VisibleSections) => {
+    setSections(next);
+    if (!user || !published) return;
+    try {
+      await publishShare(user.id, {
+        slug,
+        full_name: name,
+        headline: tag,
+        bio: story,
+        location: profile?.location ?? "",
+        avatar_path: profile?.avatar_url ?? null,
+        skills,
+        education,
+        awards,
+        timeline: [...internships, ...projects],
+        projects,
+        visible_sections: next,
+        doc_count: docs.length,
+        completeness,
+        is_public: true,
+      });
+    } catch {
+      toast.error("Could not save share settings");
+    }
+  };
 
   const copyShare = async () => {
     try {
@@ -201,7 +305,11 @@ function ProfilePage() {
 
   const doExport = async () => {
     try {
-      await generateResumePDF(name, tag);
+      await generateResumePDF(name, tag, {
+        email: profile?.email ?? identity.email,
+        location: profile?.location ?? (isGuest ? identity.location : ""),
+        story, skills, education, internships, projects, awards,
+      });
       toast.success("Resume PDF generated", { description: "Downloaded to your device." });
     } catch (e) {
       toast.error("Could not generate PDF");
@@ -412,6 +520,53 @@ function ProfilePage() {
                       </span>
                     </div>
                   )}
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  What appears on your public card
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {(Object.keys(DEFAULT_SECTIONS) as (keyof VisibleSections)[]).map((k) => (
+                    <button
+                      key={k}
+                      onClick={() => void savePublishedSections({ ...sections, [k]: !sections[k] })}
+                      aria-pressed={sections[k]}
+                      className={
+                        sections[k]
+                          ? "rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize text-white"
+                          : "glass rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize text-muted-foreground"
+                      }
+                      style={sections[k] ? { background: "var(--gradient-hero)" } : undefined}
+                    >
+                      {k}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl bg-white/60 p-3">
+                <QRCodeBox value={shareUrl} size={112} />
+                <div className="min-w-0 flex-1">
+                  <div className="text-[11px] font-semibold">Scan to open on mobile</div>
+                  <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+                    {published
+                      ? "Your public, read-only identity card is live — no login needed to view it."
+                      : "Publish to make this link open without login."}
+                  </p>
+                  <button
+                    onClick={() => void togglePublish()}
+                    disabled={publishing}
+                    className={
+                      published
+                        ? "glass mt-2 rounded-xl px-3 py-1.5 text-[11px] font-semibold disabled:opacity-50"
+                        : "mt-2 rounded-xl px-3 py-1.5 text-[11px] font-semibold text-white disabled:opacity-50"
+                    }
+                    style={published ? undefined : { background: "var(--gradient-hero)" }}
+                  >
+                    {publishing ? "Working…" : published ? "Unpublish" : "Publish public profile"}
+                  </button>
                 </div>
               </div>
 

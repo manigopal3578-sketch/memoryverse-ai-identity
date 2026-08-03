@@ -11,7 +11,7 @@ const CATEGORIES = ["All", "Certificates", "Resumes", "Projects", "Internships",
 
 export function MyDocuments({ limit }: { limit?: number }) {
   const { user } = useAuth();
-  const { docs, loading, removeLocal } = useLibrary();
+  const { docs, loading, removeLocal, upsertLocal } = useLibrary();
   const [cat, setCat] = useState("All");
   const [open, setOpen] = useState<DocRecord | null>(null);
 
@@ -98,6 +98,7 @@ export function MyDocuments({ limit }: { limit?: number }) {
             doc={open}
             onClose={() => setOpen(null)}
             onDeleted={(id) => removeLocal(id)}
+            onUpdated={(d) => { upsertLocal(d); setOpen(d); }}
           />
         )}
       </AnimatePresence>
