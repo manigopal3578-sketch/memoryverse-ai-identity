@@ -145,6 +145,25 @@ function ProfilePage() {
   }, [profile?.id, profile?.full_name, profile?.headline]);
 
   const completeness = profileCompleteness(profile, docs.length);
+  const isGuest = !user;
+
+  // Demo/reference content is guest-only; signed-in students see their own data.
+  const skills = isGuest ? identity.skills : (profile?.skills ?? []);
+  const byCategory = (match: RegExp) =>
+    docs
+      .filter((d) => match.test(d.category))
+      .map((d) => ({
+        primary: d.title,
+        secondary: [d.issuer, d.doc_date].filter(Boolean).join(" · ") || d.category,
+      }));
+  const education = isGuest ? identity.education : (profile?.education ?? []);
+  const internships = isGuest ? identity.internships : byCategory(/intern|experience|work/i);
+  const projects = isGuest ? identity.projects : byCategory(/project/i);
+  const awards = isGuest ? identity.awards : byCategory(/certificate|award|achievement/i);
+  const story = isGuest
+    ? identity.story
+    : profile?.bio ||
+      `${name} is building a verified digital identity — ${docs.length} document${docs.length === 1 ? "" : "s"} stored and growing.`;
 
   const toggleEdit = async () => {
     if (editing && user) {
@@ -165,7 +184,9 @@ function ProfilePage() {
   const [resumeOpen, setResumeOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/profile?u=ananya-rao` : "/profile";
+  const slug = (name || "student").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const shareUrl =
+    typeof window !== "undefined" ? `${window.location.origin}/profile?u=${slug}` : `/profile?u=${slug}`;
 
   const copyShare = async () => {
     try {
@@ -219,9 +240,12 @@ function ProfilePage() {
                 </>
               )}
               <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-                {identity.skills.map((s) => (
+                {skills.map((s) => (
                   <span key={s} className="glass rounded-full px-2.5 py-1 font-semibold text-primary">{s}</span>
                 ))}
+                {!isGuest && skills.length === 0 && (
+                  <span className="text-[11px] text-muted-foreground">No skills yet — upload documents to build them.</span>
+                )}
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -289,7 +313,7 @@ function ProfilePage() {
           </div>
           <div className="glass rounded-2xl p-6">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">AI Career Story</div>
-            <p className="mt-2 text-sm leading-relaxed">{identity.story}</p>
+            <p className="mt-2 text-sm leading-relaxed">{story}</p>
           </div>
           <div className="glass rounded-2xl p-6">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Quick actions</div>
@@ -308,10 +332,23 @@ function ProfilePage() {
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <Section title="Education" icon={GraduationCap} tint="var(--violet)" items={identity.education} />
-          <Section title="Internships" icon={Briefcase} tint="var(--ice)" items={identity.internships} />
-          <Section title="Projects" icon={Code2} tint="var(--mint)" items={identity.projects} />
-          <Section title="Awards & Certificates" icon={Award} tint="var(--amber)" items={identity.awards} />
+          {isGuest && (
+            <div className="md:col-span-2 -mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Demo profile · sign in to see your own
+            </div>
+          )}
+          {(isGuest || education.length > 0) && (
+            <Section title="Education" icon={GraduationCap} tint="var(--violet)" items={education} />
+          )}
+          {(isGuest || internships.length > 0) && (
+            <Section title="Internships" icon={Briefcase} tint="var(--ice)" items={internships} />
+          )}
+          {(isGuest || projects.length > 0) && (
+            <Section title="Projects" icon={Code2} tint="var(--mint)" items={projects} />
+          )}
+          {(isGuest || awards.length > 0) && (
+            <Section title="Awards & Certificates" icon={Award} tint="var(--amber)" items={awards} />
+          )}
         </div>
 
         <div className="mt-8">
@@ -354,13 +391,27 @@ function ProfilePage() {
               <div className="mt-5 overflow-hidden rounded-2xl border border-black/5 bg-white shadow-sm">
                 <div className="relative h-28" style={{ background: "var(--gradient-hero)" }}>
                   <div className="absolute inset-0 flex items-center justify-center text-white">
-                    <Sparkles size={24} />
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt={`${name} profile photo`} className="h-16 w-16 rounded-2xl object-cover ring-2 ring-white/70" />
+                    ) : (
+                      <Sparkles size={24} />
+                    )}
                   </div>
                 </div>
                 <div className="p-4">
                   <div className="text-[10px] uppercase tracking-widest text-muted-foreground">memoryverse.ai</div>
                   <div className="mt-1 text-sm font-semibold">{name} · Digital Identity</div>
                   <div className="text-[11px] text-muted-foreground">{tag}</div>
+                  {!isGuest && (
+                    <div className="mt-2 flex flex-wrap gap-1.5 text-[10px]">
+                      {skills.slice(0, 4).map((s) => (
+                        <span key={s} className="rounded-full bg-black/5 px-2 py-0.5 font-semibold text-primary">{s}</span>
+                      ))}
+                      <span className="rounded-full bg-black/5 px-2 py-0.5 font-semibold text-muted-foreground">
+                        {docs.length} document{docs.length === 1 ? "" : "s"} · {completeness}% complete
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -404,22 +455,22 @@ function ProfilePage() {
               <div className="text-[10px] font-semibold uppercase tracking-widest text-primary">Resume · AI-polished · v3</div>
               <h3 className="mt-1 font-display text-3xl">{name}</h3>
               <p className="text-xs text-muted-foreground">{tag}</p>
-              <p className="mt-4 text-sm leading-relaxed">{identity.story}</p>
+              <p className="mt-4 text-sm leading-relaxed">{story}</p>
 
               <ResumeBlock title="Skills">
-                <p className="text-xs text-muted-foreground">{identity.skills.join("  ·  ")}</p>
+                <p className="text-xs text-muted-foreground">{skills.join("  ·  ") || "—"}</p>
               </ResumeBlock>
               <ResumeBlock title="Education">
-                {identity.education.map((e) => <MiniRow key={e.primary} {...e} />)}
+                {education.map((e) => <MiniRow key={e.primary} {...e} />)}
               </ResumeBlock>
               <ResumeBlock title="Experience">
-                {identity.internships.map((e) => <MiniRow key={e.primary} {...e} />)}
+                {internships.map((e) => <MiniRow key={e.primary} {...e} />)}
               </ResumeBlock>
               <ResumeBlock title="Projects">
-                {identity.projects.map((e) => <MiniRow key={e.primary} {...e} />)}
+                {projects.map((e) => <MiniRow key={e.primary} {...e} />)}
               </ResumeBlock>
               <ResumeBlock title="Awards">
-                {identity.awards.map((e) => <MiniRow key={e.primary} {...e} />)}
+                {awards.map((e) => <MiniRow key={e.primary} {...e} />)}
               </ResumeBlock>
 
               <div className="mt-6 flex justify-end gap-2">
