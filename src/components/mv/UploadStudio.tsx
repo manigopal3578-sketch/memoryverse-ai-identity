@@ -274,7 +274,8 @@ export function UploadStudio() {
         setFinishing(false);
       }
     },
-    [user, upsertLocal],
+    [user, refresh],
+
   );
 
 
