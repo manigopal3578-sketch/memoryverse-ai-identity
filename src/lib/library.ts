@@ -57,7 +57,9 @@ export async function listDocuments(): Promise<DocRecord[]> {
   const { data, error } = await supabase
     .from("documents")
     .select("*")
+    .eq("is_demo", false)
     .order("created_at", { ascending: false });
+
   if (error) throw error;
   return (data ?? []).map((r) => toDoc(r as Record<string, unknown>));
 }
