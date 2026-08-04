@@ -237,8 +237,18 @@ function ProfilePage() {
       if (published) {
         await unpublishShare(user.id);
         setPublished(false);
-        toast.success("Public profile unpublished");
+        toast.success("Public profile revoked", {
+          description: "The /p link and QR code no longer open your card.",
+        });
       } else {
+        const og = await buildShareImage(user.id, {
+          name: name,
+          headline: tag,
+          skills,
+          docCount: docs.length,
+          completeness,
+          avatarUrl: profile?.avatar_url ?? null,
+        });
         await publishShare(user.id, {
           slug,
           full_name: name,
@@ -246,6 +256,7 @@ function ProfilePage() {
           bio: story,
           location: profile?.location ?? "",
           avatar_path: profile?.avatar_url ?? null,
+          og_image_url: og,
           skills,
           education,
           awards,
@@ -291,6 +302,7 @@ function ProfilePage() {
       toast.error("Could not save share settings");
     }
   };
+
 
   const copyShare = async () => {
     try {
