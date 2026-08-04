@@ -561,14 +561,25 @@ function ProfilePage() {
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl bg-white/60 p-3">
-                <QRCodeBox value={shareUrl} size={112} />
+                {published ? (
+                  <QRCodeBox value={shareUrl} size={112} />
+                ) : (
+                  <div
+                    className="flex h-28 w-28 shrink-0 items-center justify-center rounded-xl bg-white/70 p-3 text-center text-[10px] text-muted-foreground"
+                    role="img"
+                    aria-label="QR code disabled — profile is not published"
+                  >
+                    QR disabled until published
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="text-[11px] font-semibold">Scan to open on mobile</div>
                   <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
                     {published
                       ? "Your public, read-only identity card is live — no login needed to view it."
-                      : "Publish to make this link open without login."}
+                      : "Revoked — the /p link and any shared QR code now show nothing. Publish to re-enable."}
                   </p>
+
                   <button
                     onClick={() => void togglePublish()}
                     disabled={publishing}
