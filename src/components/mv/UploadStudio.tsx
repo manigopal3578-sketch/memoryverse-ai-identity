@@ -746,6 +746,24 @@ export function UploadStudio() {
                   </div>
                 </div>
               </div>
+
+              <div className="mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-black/5 pt-4">
+                <span className="mr-auto text-[11px] text-muted-foreground">
+                  {active.savedId
+                    ? "Stored in your vault — finish to apply your edits and clear this card."
+                    : "Guest preview — sign in to keep this document forever."}
+                </span>
+                <button
+                  onClick={() => void finishItem(active)}
+                  disabled={finishing || active.stage < stages.length - 1}
+                  className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-[12px] font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+                  style={{ background: "var(--gradient-hero)" }}
+                >
+                  {finishing ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+                  Done · add to library
+                </button>
+              </div>
+
             </motion.div>
           )}
         </AnimatePresence>
