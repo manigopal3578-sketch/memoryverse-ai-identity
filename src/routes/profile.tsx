@@ -13,6 +13,7 @@ import { AvatarPicker } from "@/components/mv/AvatarPicker";
 import { MyDocuments } from "@/components/mv/MyDocuments";
 import { SignedOutNotice } from "@/components/mv/AuthButton";
 import { QRCodeBox } from "@/components/mv/QRCodeBox";
+import { buildShareImage } from "@/lib/og-card";
 import {
   DEFAULT_SECTIONS,
   loadMyShare,
@@ -21,6 +22,7 @@ import {
   unpublishShare,
   type VisibleSections,
 } from "@/lib/share";
+
 
 
 export const Route = createFileRoute("/profile")({
