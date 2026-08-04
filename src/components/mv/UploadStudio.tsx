@@ -23,6 +23,7 @@ import {
   GraduationCap,
   Globe,
   CalendarDays,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { smartName, smartNameFromUrl, type SmartCategory } from "@/lib/smart-name";
