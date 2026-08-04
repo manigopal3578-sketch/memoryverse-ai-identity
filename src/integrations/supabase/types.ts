@@ -194,6 +194,7 @@ export type Database = {
           headline: string
           is_public: boolean
           location: string
+          og_image_url: string | null
           projects: Json
           skills: Json
           slug: string
@@ -214,6 +215,7 @@ export type Database = {
           headline?: string
           is_public?: boolean
           location?: string
+          og_image_url?: string | null
           projects?: Json
           skills?: Json
           slug: string
@@ -234,6 +236,7 @@ export type Database = {
           headline?: string
           is_public?: boolean
           location?: string
+          og_image_url?: string | null
           projects?: Json
           skills?: Json
           slug?: string
