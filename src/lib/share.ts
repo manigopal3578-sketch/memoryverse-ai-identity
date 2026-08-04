@@ -28,6 +28,7 @@ export interface PublicProfile {
   bio: string;
   location: string;
   avatar_url: string | null;
+  og_image_url: string | null;
   skills: string[];
   education: { primary: string; secondary: string }[];
   awards: { primary: string; secondary: string }[];
@@ -37,6 +38,7 @@ export interface PublicProfile {
   doc_count: number;
   completeness: number;
 }
+
 
 export function slugify(input: string) {
   return (
