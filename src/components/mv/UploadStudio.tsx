@@ -32,7 +32,7 @@ import { CorrectionHistory } from "./CorrectionHistory";
 import { MyDocuments } from "./MyDocuments";
 import { useAuth } from "@/lib/auth";
 import { useLibrary } from "@/lib/useLibrary";
-import { createDocument, saveCorrection, uploadDocumentFile } from "@/lib/library";
+import { createDocument, saveCorrection, updateDocument, uploadDocumentFile } from "@/lib/library";
 
 const DocumentViewer = lazy(() =>
   import("./DocumentViewer").then((m) => ({ default: m.DocumentViewer })),
@@ -64,6 +64,8 @@ interface ParsedFile {
   body: string;
   highlights: { id: string; text: string; label: string }[];
   proofImage?: string;
+  savedId?: string;
+  demo?: boolean;
 }
 
 const catIcon: Record<SmartCategory, typeof Award> = {
@@ -152,6 +154,7 @@ export function UploadStudio() {
   const [drag, setDrag] = useState(false);
   const [files, setFiles] = useState<ParsedFile[]>(seed);
   const [selected, setSelected] = useState<string>(seed[0].id);
+  const [finishing, setFinishing] = useState(false);
   const [showViewer, setShowViewer] = useState(false);
   const [detailFor, setDetailFor] = useState<string | null>(null);
   const [urlInput, setUrlInput] = useState("");
@@ -194,6 +197,7 @@ export function UploadStudio() {
           file_size: raw.size,
         });
         upsertLocal(saved);
+        setFiles((prev) => prev.map((f) => (f.id === parsed.id ? { ...f, savedId: saved.id } : f)));
         toast.success("Saved to your vault", { description: saved.title });
       } catch {
         toast.error("Could not save that file to your vault");
@@ -218,6 +222,7 @@ export function UploadStudio() {
           confidence: 0.9,
         });
         upsertLocal(saved);
+        setFiles((prev) => prev.map((f) => (f.id === parsed.id ? { ...f, savedId: saved.id } : f)));
         toast.success("Link saved to your vault", { description: saved.title });
       } catch {
         toast.error("Could not save that link");
