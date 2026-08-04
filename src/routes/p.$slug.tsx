@@ -21,7 +21,7 @@ export const Route = createFileRoute("/p/$slug")({
         .join(" · ")
         .slice(0, 155) || "An AI-composed student identity on MemoryVerse AI.";
     const url = `${SITE}/p/${params.slug}`;
-    const image = loaderData?.avatar_url ?? null;
+    const image = loaderData?.og_image_url ?? loaderData?.avatar_url ?? null;
     return {
       meta: [
         { title },

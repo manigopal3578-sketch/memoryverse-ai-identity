@@ -8,6 +8,7 @@ export interface PublicProfileView {
   bio: string;
   location: string;
   avatar_url: string | null;
+  og_image_url: string | null;
   skills: string[];
   education: { primary: string; secondary: string }[];
   awards: { primary: string; secondary: string }[];
@@ -29,7 +30,7 @@ export const getPublicProfile = createServerFn({ method: "GET" })
     const { data: row } = await client
       .from("public_profiles")
       .select(
-        "slug, full_name, headline, bio, location, avatar_url, skills, education, awards, timeline, projects, visible_sections, doc_count, completeness",
+        "slug, full_name, headline, bio, location, avatar_url, og_image_url, skills, education, awards, timeline, projects, visible_sections, doc_count, completeness",
       )
       .eq("slug", data.slug)
       .eq("is_public", true)
