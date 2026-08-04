@@ -13,6 +13,7 @@ import { AvatarPicker } from "@/components/mv/AvatarPicker";
 import { MyDocuments } from "@/components/mv/MyDocuments";
 import { SignedOutNotice } from "@/components/mv/AuthButton";
 import { QRCodeBox } from "@/components/mv/QRCodeBox";
+import { buildShareImage } from "@/lib/og-card";
 import {
   DEFAULT_SECTIONS,
   loadMyShare,
@@ -21,6 +22,7 @@ import {
   unpublishShare,
   type VisibleSections,
 } from "@/lib/share";
+
 
 
 export const Route = createFileRoute("/profile")({
@@ -237,8 +239,18 @@ function ProfilePage() {
       if (published) {
         await unpublishShare(user.id);
         setPublished(false);
-        toast.success("Public profile unpublished");
+        toast.success("Public profile revoked", {
+          description: "The /p link and QR code no longer open your card.",
+        });
       } else {
+        const og = await buildShareImage(user.id, {
+          name: name,
+          headline: tag,
+          skills,
+          docCount: docs.length,
+          completeness,
+          avatarUrl: profile?.avatar_url ?? null,
+        });
         await publishShare(user.id, {
           slug,
           full_name: name,
@@ -246,6 +258,7 @@ function ProfilePage() {
           bio: story,
           location: profile?.location ?? "",
           avatar_path: profile?.avatar_url ?? null,
+          og_image_url: og,
           skills,
           education,
           awards,
@@ -291,6 +304,7 @@ function ProfilePage() {
       toast.error("Could not save share settings");
     }
   };
+
 
   const copyShare = async () => {
     try {
@@ -547,14 +561,25 @@ function ProfilePage() {
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl bg-white/60 p-3">
-                <QRCodeBox value={shareUrl} size={112} />
+                {published ? (
+                  <QRCodeBox value={shareUrl} size={112} />
+                ) : (
+                  <div
+                    className="flex h-28 w-28 shrink-0 items-center justify-center rounded-xl bg-white/70 p-3 text-center text-[10px] text-muted-foreground"
+                    role="img"
+                    aria-label="QR code disabled — profile is not published"
+                  >
+                    QR disabled until published
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="text-[11px] font-semibold">Scan to open on mobile</div>
                   <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
                     {published
                       ? "Your public, read-only identity card is live — no login needed to view it."
-                      : "Publish to make this link open without login."}
+                      : "Revoked — the /p link and any shared QR code now show nothing. Publish to re-enable."}
                   </p>
+
                   <button
                     onClick={() => void togglePublish()}
                     disabled={publishing}

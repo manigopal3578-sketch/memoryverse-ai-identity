@@ -23,6 +23,7 @@ import {
   GraduationCap,
   Globe,
   CalendarDays,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { smartName, smartNameFromUrl, type SmartCategory } from "@/lib/smart-name";
@@ -32,7 +33,7 @@ import { CorrectionHistory } from "./CorrectionHistory";
 import { MyDocuments } from "./MyDocuments";
 import { useAuth } from "@/lib/auth";
 import { useLibrary } from "@/lib/useLibrary";
-import { createDocument, saveCorrection, uploadDocumentFile } from "@/lib/library";
+import { createDocument, saveCorrection, updateDocument, uploadDocumentFile } from "@/lib/library";
 
 const DocumentViewer = lazy(() =>
   import("./DocumentViewer").then((m) => ({ default: m.DocumentViewer })),
@@ -64,6 +65,8 @@ interface ParsedFile {
   body: string;
   highlights: { id: string; text: string; label: string }[];
   proofImage?: string;
+  savedId?: string;
+  demo?: boolean;
 }
 
 const catIcon: Record<SmartCategory, typeof Award> = {
@@ -152,6 +155,7 @@ export function UploadStudio() {
   const [drag, setDrag] = useState(false);
   const [files, setFiles] = useState<ParsedFile[]>(seed);
   const [selected, setSelected] = useState<string>(seed[0].id);
+  const [finishing, setFinishing] = useState(false);
   const [showViewer, setShowViewer] = useState(false);
   const [detailFor, setDetailFor] = useState<string | null>(null);
   const [urlInput, setUrlInput] = useState("");
@@ -169,7 +173,7 @@ export function UploadStudio() {
       Portfolio: "Projects",
       Event: "Events",
     })[c] ?? "Certificates";
-  const { upsertLocal } = useLibrary();
+  const { upsertLocal, refresh } = useLibrary();
 
   /** Persists a picked file (and its AI-extracted metadata) to the signed-in student's vault. */
   const persistFile = useCallback(
@@ -194,6 +198,7 @@ export function UploadStudio() {
           file_size: raw.size,
         });
         upsertLocal(saved);
+        setFiles((prev) => prev.map((f) => (f.id === parsed.id ? { ...f, savedId: saved.id } : f)));
         toast.success("Saved to your vault", { description: saved.title });
       } catch {
         toast.error("Could not save that file to your vault");
@@ -218,12 +223,60 @@ export function UploadStudio() {
           confidence: 0.9,
         });
         upsertLocal(saved);
+        setFiles((prev) => prev.map((f) => (f.id === parsed.id ? { ...f, savedId: saved.id } : f)));
         toast.success("Link saved to your vault", { description: saved.title });
       } catch {
         toast.error("Could not save that link");
       }
     },
     [user, upsertLocal],
+  );
+
+  /** Demo/reference items are guest-only: a signed-in student sees only their own uploads. */
+  useEffect(() => {
+    if (!user) return;
+    const demoIds = new Set(seed.map((s) => s.id));
+    setFiles((prev) => {
+      const next = prev.filter((f) => !demoIds.has(f.id));
+      setSelected((cur) => (demoIds.has(cur) ? (next[0]?.id ?? "") : cur));
+      return next;
+    });
+  }, [user]);
+
+  /** Finalises the item: syncs the edited metadata to the vault and clears the editing surface. */
+  const finishItem = useCallback(
+    async (item: ParsedFile) => {
+      setFinishing(true);
+      try {
+        if (user && item.savedId) {
+          const patch = {
+            title: item.displayName,
+            issuer: item.issuer ?? "",
+            category: dbCategory(item.category),
+            fields: item.fields.map((f) => ({ label: f.label, value: f.value })),
+          };
+          await updateDocument(item.savedId, patch);
+          await refresh();
+          toast.success("Added to your library", { description: item.displayName });
+        } else if (!user) {
+          toast("Sign in to keep this", { description: "Guest previews are not stored." });
+        }
+        setEditing(null);
+        setShowViewer(false);
+        setDetailFor(null);
+        setFiles((prev) => {
+          const next = prev.filter((f) => f.id !== item.id);
+          setSelected(next[0]?.id ?? "");
+          return next;
+        });
+      } catch {
+        toast.error("Could not finalise this document");
+      } finally {
+        setFinishing(false);
+      }
+    },
+    [user, refresh],
+
   );
 
 
@@ -694,6 +747,24 @@ export function UploadStudio() {
                   </div>
                 </div>
               </div>
+
+              <div className="mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-black/5 pt-4">
+                <span className="mr-auto text-[11px] text-muted-foreground">
+                  {active.savedId
+                    ? "Stored in your vault — finish to apply your edits and clear this card."
+                    : "Guest preview — sign in to keep this document forever."}
+                </span>
+                <button
+                  onClick={() => void finishItem(active)}
+                  disabled={finishing || active.stage < stages.length - 1}
+                  className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-[12px] font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+                  style={{ background: "var(--gradient-hero)" }}
+                >
+                  {finishing ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+                  Done · add to library
+                </button>
+              </div>
+
             </motion.div>
           )}
         </AnimatePresence>

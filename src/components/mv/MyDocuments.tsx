@@ -82,10 +82,12 @@ export function MyDocuments({ limit }: { limit?: number }) {
                 <button
                   onClick={() => setOpen(d)}
                   aria-label={`Preview ${d.title}`}
-                  className="rounded-lg bg-white p-2 text-primary shadow-sm transition hover:scale-105"
+                  title="Open full preview"
+                  className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg bg-white p-2 text-primary shadow-sm transition hover:scale-105"
                 >
-                  <Eye size={14} />
+                  <Eye size={16} />
                 </button>
+
               </motion.div>
             );
           })}

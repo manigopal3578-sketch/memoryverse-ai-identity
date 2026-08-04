@@ -70,6 +70,7 @@ export function DocumentPreviewModal({
   onUpdated?: (doc: DocRecord) => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [doc, setDoc] = useState<DocRecord>(initialDoc);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -83,13 +84,40 @@ export function DocumentPreviewModal({
   const { icon: Icon, tint } = categoryVisual(doc.category);
 
   useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !panelRef.current) return;
+      const nodes = Array.from(
+        panelRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input, select, textarea, iframe, [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el.offsetParent !== null || el === document.activeElement);
+      if (nodes.length === 0) return;
+      const first = nodes[0]!;
+      const last = nodes[nodes.length - 1]!;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = overflow;
+      previous?.focus?.();
+    };
   }, [onClose]);
+
 
   useEffect(() => {
     let active = true;
@@ -141,7 +169,7 @@ export function DocumentPreviewModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-black/60 p-3 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-stretch justify-center overflow-y-auto overscroll-contain bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-6"
       onClick={onClose}
     >
       <motion.div
@@ -152,10 +180,11 @@ export function DocumentPreviewModal({
         role="dialog"
         aria-modal="true"
         aria-label={`${doc.category} preview: ${doc.title}`}
-        className="glass my-auto max-h-[92dvh] w-full max-w-[min(48rem,100%)] overflow-hidden rounded-3xl p-0"
+        ref={panelRef}
+        className="glass my-auto flex h-dvh w-full max-w-none flex-col overflow-hidden rounded-none p-0 sm:h-[94dvh] sm:max-w-[min(72rem,100%)] sm:rounded-3xl"
       >
         <div
-          className="flex items-center justify-between gap-3 p-5 text-white"
+          className="flex shrink-0 items-center justify-between gap-3 p-5 text-white"
           style={{ background: `linear-gradient(135deg, ${tint}, var(--indigo))` }}
         >
           <div className="flex min-w-0 items-center gap-3">
@@ -171,13 +200,13 @@ export function DocumentPreviewModal({
             ref={closeRef}
             aria-label="Close preview"
             onClick={onClose}
-            className="rounded-lg bg-white/20 p-1.5 hover:bg-white/30"
+            className="rounded-lg bg-white/20 p-2.5 hover:bg-white/30"
           >
             <X size={16} />
           </button>
         </div>
 
-        <div className="max-h-[calc(92dvh-92px)] space-y-4 overflow-y-auto overscroll-contain p-4 sm:p-5">
+        <div className="flex-1 space-y-4 overflow-y-auto overscroll-contain p-4 sm:p-6">
           <div className="flex flex-wrap gap-2 text-[11px]">
             {doc.issuer && (
               <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-1">
@@ -212,9 +241,9 @@ export function DocumentPreviewModal({
               </div>
               {fileUrl ? (
                 isImage ? (
-                  <img src={fileUrl} alt={doc.title} className="max-h-[42vh] w-full object-contain" />
+                  <img src={fileUrl} alt={doc.title} className="max-h-[70dvh] w-full bg-black/5 object-contain" />
                 ) : isPdf ? (
-                  <iframe src={fileUrl} title={doc.title} className="h-[42vh] w-full" />
+                  <iframe src={fileUrl} title={doc.title} className="h-[70dvh] w-full" />
                 ) : (
                   <div className="p-6 text-center text-xs text-muted-foreground">
                     Preview not available for this file type — use “Open original”.

@@ -28,6 +28,7 @@ export interface PublicProfile {
   bio: string;
   location: string;
   avatar_url: string | null;
+  og_image_url: string | null;
   skills: string[];
   education: { primary: string; secondary: string }[];
   awards: { primary: string; secondary: string }[];
@@ -37,6 +38,7 @@ export interface PublicProfile {
   doc_count: number;
   completeness: number;
 }
+
 
 export function slugify(input: string) {
   return (
@@ -64,6 +66,7 @@ export interface PublishInput {
   bio: string;
   location: string;
   avatar_path: string | null;
+  og_image_url?: string | null;
   skills: string[];
   education: { primary: string; secondary: string }[];
   awards: { primary: string; secondary: string }[];
@@ -93,10 +96,12 @@ export async function publishShare(userId: string, input: PublishInput): Promise
   return data as unknown as PublicProfile;
 }
 
+/** Immediately revokes the public page: /p/:slug 404s and the QR target stops resolving. */
 export async function unpublishShare(userId: string): Promise<void> {
   const { error } = await supabase
     .from("public_profiles")
-    .update({ is_public: false } as never)
+    .update({ is_public: false, og_image_url: null } as never)
     .eq("user_id", userId);
   if (error) throw error;
 }
+
