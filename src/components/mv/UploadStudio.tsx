@@ -231,6 +231,52 @@ export function UploadStudio() {
     [user, upsertLocal],
   );
 
+  /** Demo/reference items are guest-only: a signed-in student sees only their own uploads. */
+  useEffect(() => {
+    if (!user) return;
+    const demoIds = new Set(seed.map((s) => s.id));
+    setFiles((prev) => {
+      const next = prev.filter((f) => !demoIds.has(f.id));
+      setSelected((cur) => (demoIds.has(cur) ? (next[0]?.id ?? "") : cur));
+      return next;
+    });
+  }, [user]);
+
+  /** Finalises the item: syncs the edited metadata to the vault and clears the editing surface. */
+  const finishItem = useCallback(
+    async (item: ParsedFile) => {
+      setFinishing(true);
+      try {
+        if (user && item.savedId) {
+          const patch = {
+            title: item.displayName,
+            issuer: item.issuer ?? "",
+            category: dbCategory(item.category),
+            fields: item.fields.map((f) => ({ label: f.label, value: f.value })),
+          };
+          const saved = await updateDocument(item.savedId, patch);
+          if (saved) upsertLocal(saved);
+          toast.success("Added to your library", { description: item.displayName });
+        } else if (!user) {
+          toast("Sign in to keep this", { description: "Guest previews are not stored." });
+        }
+        setEditing(null);
+        setShowViewer(false);
+        setDetailFor(null);
+        setFiles((prev) => {
+          const next = prev.filter((f) => f.id !== item.id);
+          setSelected(next[0]?.id ?? "");
+          return next;
+        });
+      } catch {
+        toast.error("Could not finalise this document");
+      } finally {
+        setFinishing(false);
+      }
+    },
+    [user, upsertLocal],
+  );
+
 
   const advance = useCallback((id: string) => {
     timers.current[id] = setInterval(() => {
