@@ -172,7 +172,7 @@ export function UploadStudio() {
       Portfolio: "Projects",
       Event: "Events",
     })[c] ?? "Certificates";
-  const { upsertLocal } = useLibrary();
+  const { upsertLocal, refresh } = useLibrary();
 
   /** Persists a picked file (and its AI-extracted metadata) to the signed-in student's vault. */
   const persistFile = useCallback(
@@ -254,8 +254,8 @@ export function UploadStudio() {
             category: dbCategory(item.category),
             fields: item.fields.map((f) => ({ label: f.label, value: f.value })),
           };
-          const saved = await updateDocument(item.savedId, patch);
-          if (saved) upsertLocal(saved);
+          await updateDocument(item.savedId, patch);
+          await refresh();
           toast.success("Added to your library", { description: item.displayName });
         } else if (!user) {
           toast("Sign in to keep this", { description: "Guest previews are not stored." });
